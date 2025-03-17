@@ -31,8 +31,25 @@ const server = http.createServer((req, res) => {
     
     // Normalize URL path
     let filePath = req.url === '/' ? '/index.html' : req.url;
-    filePath = path.join(__dirname, filePath);
     
+    // Check if the file is in the root directory first
+    let rootFilePath = path.join(__dirname, '..', filePath);
+    
+    // If the file doesn't exist in the root, look in the frontend directory
+    fs.access(rootFilePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            // File not in root, try frontend directory
+            filePath = path.join(__dirname, filePath);
+            serveFile(filePath, res);
+        } else {
+            // File exists in root
+            serveFile(rootFilePath, res);
+        }
+    });
+});
+
+// Function to serve a file
+function serveFile(filePath, res) {
     // Get file extension
     const extname = path.extname(filePath).toLowerCase();
     
@@ -44,13 +61,22 @@ const server = http.createServer((req, res) => {
         if (err) {
             if (err.code === 'ENOENT') {
                 // File not found
-                fs.readFile(path.join(__dirname, '/index.html'), (err, content) => {
+                fs.readFile(path.join(__dirname, '..', 'index.html'), (err, content) => {
                     if (err) {
-                        // Something went very wrong
-                        res.writeHead(500);
-                        res.end('Server Error');
+                        // Try the frontend directory
+                        fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
+                            if (err) {
+                                // Something went very wrong
+                                res.writeHead(500);
+                                res.end('Server Error');
+                            } else {
+                                // Return index.html for client-side routing
+                                res.writeHead(200, { 'Content-Type': 'text/html' });
+                                res.end(content, 'utf-8');
+                            }
+                        });
                     } else {
-                        // Return index.html for client-side routing
+                        // Return index.html from root for client-side routing
                         res.writeHead(200, { 'Content-Type': 'text/html' });
                         res.end(content, 'utf-8');
                     }
@@ -66,7 +92,7 @@ const server = http.createServer((req, res) => {
             res.end(content, 'utf-8');
         }
     });
-});
+}
 
 // Function to proxy requests to the backend
 function proxyRequest(req, res) {

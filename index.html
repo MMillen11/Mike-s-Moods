@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker</title>
+    <link rel="stylesheet" href="frontend/css/styles.css">
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mood Tracker</h1>
+            <p>Track your daily moods and behaviors to discover patterns</p>
+        </header>
+
+        <main>
+            <section id="mood-entry-form">
+                <h2>Daily Mood Entry</h2>
+                <form id="mood-form">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="mood">How are you feeling today? <span class="slider-value">5</span></label>
+                        <input type="range" id="mood" name="mood" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Very Negative (1)</span>
+                            <span>Very Positive (10)</span>
+                        </div>
+                    </div>
+
+                    <h3>Daily Variables (Rate 1-10)</h3>
+                    
+                    <div class="form-group slider-group">
+                        <label for="exercise">Exercise Quality: <span class="slider-value">5</span></label>
+                        <input type="range" id="exercise" name="exercise" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Poor (1)</span>
+                            <span>Excellent (10)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="sleep">Sleep Quality: <span class="slider-value">5</span></label>
+                        <input type="range" id="sleep" name="sleep" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Poor (≤3hrs)</span>
+                            <span>Excellent (≥8hrs)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="diet">Diet Observance: <span class="slider-value">5</span></label>
+                        <input type="range" id="diet" name="diet" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Poor</span>
+                            <span>Excellent</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="portfolio">Stock Portfolio Performance: <span class="slider-value">5</span></label>
+                        <input type="range" id="portfolio" name="portfolio" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Down ≥1%</span>
+                            <span>Up ≥1%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="job">Job Satisfaction Level: <span class="slider-value">5</span></label>
+                        <input type="range" id="job" name="job" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>Low</span>
+                            <span>High</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="social">Social Interaction Level: <span class="slider-value">5</span></label>
+                        <input type="range" id="social" name="social" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>None</span>
+                            <span>Very Social</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="alcohol">Alcohol Consumption Level: <span class="slider-value">5</span></label>
+                        <input type="range" id="alcohol" name="alcohol" min="1" max="10" value="10" class="slider" required>
+                        <div class="slider-labels">
+                            <span>High (≥10 drinks)</span>
+                            <span>None (0 drinks)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group slider-group">
+                        <label for="sunlight">Sunlight Exposure: <span class="slider-value">5</span></label>
+                        <input type="range" id="sunlight" name="sunlight" min="1" max="10" value="5" class="slider" required>
+                        <div class="slider-labels">
+                            <span>None</span>
+                            <span>≥1 hour</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weather">Weather Today:</label>
+                        <select id="weather" name="weather" required>
+                            <option value="sunny">Sunny</option>
+                            <option value="cloudy">Cloudy</option>
+                            <option value="rainy">Rainy</option>
+                            <option value="snowy">Snowy</option>
+                            <option value="stormy">Stormy</option>
+                        </select>
+                        <p class="weather-note">Auto-populated based on current weather in Pittsburgh</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Additional Notes:</label>
+                        <textarea id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Save Entry</button>
+                </form>
+            </section>
+
+            <section id="data-visualization" class="hidden">
+                <h2>Your Mood Patterns</h2>
+                <div class="visualization-controls">
+                    <button id="view-all-data" class="btn">View All Data</button>
+                    <button id="view-mood-trends" class="btn">Comprehensive Chart</button>
+                    <button id="view-correlations" class="btn">Behavior Correlations</button>
+                </div>
+                <div id="charts-container">
+                    <!-- Charts will be inserted here by JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Mood Tracker App | <a href="frontend/backfill.html" style="color: #4a6fa5; text-decoration: none;">Generate Test Data</a></p>
+        </footer>
+    </div>
+
+    <script src="frontend/js/app.js"></script>
+</body>
+</html> 

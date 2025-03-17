@@ -1,70 +1,67 @@
 # Mood Tracker Application
 
-A web application to track daily moods and behaviors to identify correlations between actions and emotional states.
+A comprehensive web application for tracking daily mood and various lifestyle factors to discover patterns and correlations.
 
 ## Features
 
-- Track 7 different types of moods (Relaxed, Content, Irritable, Sad, Angry, Excited, Anxious)
-- Record daily behavioral actions (exercise, sleep, alcohol consumption, diet adherence, work stress, relationship status, social activity, weather)
-- Visualize correlations between behaviors and moods through graphs
-
-## Tech Stack
-
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Python (Flask)
+- **Daily Mood Entry**: Record your mood and various lifestyle factors on a 1-10 scale
+- **Weather Integration**: Automatically fetches weather data for Pittsburgh, PA
+- **Comprehensive Visualizations**:
+  - Mood trends over time
+  - Correlations between mood and lifestyle factors
+  - Interactive charts with selectable variables
+- **Data Management**: All entries are stored in your browser's localStorage
 
 ## Project Structure
 
-- `/frontend`: Contains all HTML, CSS, and JavaScript files
-- `/backend_python`: Contains Python backend code
+```
+Mood Tracker/
+├── index.html              # Main application entry point
+├── frontend/
+│   ├── js/
+│   │   ├── app.js          # Main application logic
+│   │   └── backfill.js     # Script to generate test data
+│   ├── css/
+│   │   └── styles.css      # Application styling
+│   ├── backfill.html       # Page to generate test data
+│   └── server.js           # Development server
+├── backend_python/
+│   └── app.py              # Python backend API
+└── backend/
+    └── ...                 # .NET backend (alternative)
+```
 
-## Getting Started
+## How to Run
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (for running the frontend server)
-- [Python 3.6+](https://www.python.org/downloads/) (for running the backend)
-
-### Running the Frontend
-
-1. Navigate to the frontend directory:
+1. **Start the frontend server**:
    ```
    cd frontend
-   ```
-
-2. Start the Node.js server:
-   ```
+   npm install
    node server.js
    ```
 
-3. Open your browser and go to http://localhost:5000
+2. **Access the application**:
+   Open your browser and navigate to `http://localhost:5000`
 
-### Running the Backend
+3. **Generate test data** (optional):
+   Click on "Generate Test Data" link at the bottom of the page
 
-1. Navigate to the backend_python directory:
-   ```
-   cd backend_python
-   ```
+## Technologies Used
 
-2. Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
+- **Frontend**: HTML, CSS, JavaScript, Chart.js
+- **Backend**: Python Flask API
+- **Data Storage**: Browser localStorage (client-side)
+- **Weather Data**: OpenWeatherMap API
 
-3. Start the Flask server:
-   ```
-   python app.py
-   ```
+## Behavioral Variables Tracked
 
-4. The API will be available at http://localhost:5001
-
-## Using the Application
-
-1. Fill out the daily mood entry form with your current mood and behavioral actions
-2. Submit the form to save your entry
-3. View visualizations to see patterns between your behaviors and moods
-4. Over time, identify which behaviors correlate with positive or negative moods
-
-## Offline Functionality
-
-The application stores your mood entries in the browser's localStorage, so you can use it even when offline. When you reconnect to the internet, the data will be synchronized with the backend. 
+- Mood (1-10)
+- Exercise Quality (1-10)
+- Sleep Quality (1-10)
+- Diet Observance (1-10)
+- Stock Portfolio Performance (1-10)
+- Job Satisfaction (1-10)
+- Social Interaction (1-10)
+- Alcohol Consumption (1-10)
+- Sunlight Exposure (1-10)
+- Weather Conditions 
