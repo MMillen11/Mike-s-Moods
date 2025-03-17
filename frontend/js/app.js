@@ -512,15 +512,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Define all variables to track
         const variables = [
-            { key: 'mood', name: 'Mood', color: '#FF5733', visible: true },
-            { key: 'exercise', name: 'Exercise', color: '#33FF57', visible: false },
-            { key: 'sleep', name: 'Sleep', color: '#3357FF', visible: false },
-            { key: 'diet', name: 'Diet', color: '#FF33F5', visible: false },
-            { key: 'portfolio', name: 'Portfolio', color: '#33FFF5', visible: false },
-            { key: 'job', name: 'Job', color: '#F5FF33', visible: false },
-            { key: 'social', name: 'Social', color: '#FF8C33', visible: false },
-            { key: 'alcohol', name: 'Alcohol', color: '#8C33FF', visible: false },
-            { key: 'sunlight', name: 'Sunlight', color: '#33FFCB', visible: false }
+            { key: 'mood', name: 'Mood', color: '#ff9800', visible: true },         // Orange
+            { key: 'exercise', name: 'Exercise', color: '#4caf50', visible: false }, // Green
+            { key: 'sleep', name: 'Sleep', color: '#9c27b0', visible: false },      // Purple
+            { key: 'diet', name: 'Diet', color: '#8bc34a', visible: false },        // Light Green
+            { key: 'portfolio', name: 'Portfolio', color: '#2196f3', visible: false }, // Blue
+            { key: 'job', name: 'Job', color: '#607d8b', visible: false },          // Blue Gray
+            { key: 'social', name: 'Social', color: '#e91e63', visible: false },    // Pink
+            { key: 'alcohol', name: 'Alcohol', color: '#795548', visible: false },  // Brown
+            { key: 'sunlight', name: 'Sunlight', color: '#ffc107', visible: false } // Yellow
         ];
         
         // Calculate data for each variable
@@ -664,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create header for the weather-mood chart
         chartDiv.innerHTML = `
-            <h3>Weather and Mood Relationship</h3>
+            <h3>Weather Conditions</h3>
             <p class="chart-description">How different weather conditions affect your mood levels</p>
             <div class="weather-mood-container">
                 <canvas id="weather-mood-chart"></canvas>
