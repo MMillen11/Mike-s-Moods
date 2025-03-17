@@ -43,7 +43,7 @@
         const portfolio = getRandomInt(1, 10);
         const job = getRandomInt(1, 10);
         const social = getRandomInt(1, 10);
-        const alcohol = getRandomInt(1, 10); // Remember: 10 = no alcohol, 1 = high consumption
+        const alcohol = getRandomInt(1, 10); // 1 = 0 drinks, 10 = 10+ drinks
         
         // Calculate mood with stronger correlation to sleep and sunlight
         // Sleep and sunlight have 2x the weight of other factors

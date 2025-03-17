@@ -92,46 +92,140 @@ input:focus, select:focus, textarea:focus {
 /* Slider Styles */
 .slider-group {
     padding-bottom: 10px;
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.slider-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Restore the emoji icon display for labels */
+.emoji-icon {
+    display: inline-block;
+    font-size: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
 }
 
 .slider {
+    position: relative;
     -webkit-appearance: none;
     height: 10px;
     border-radius: 5px;
-    background: #ddd;
+    background: #e0e0e0;
     outline: none;
     margin: 10px 0;
     transition: background 0.2s;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Needed for the fill effect */
+}
+
+/* Create the fill effect for WebKit browsers */
+.slider::-webkit-slider-runnable-track {
+    height: 10px;
+    border-radius: 5px;
+    background: #e0e0e0;
 }
 
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: white;
     cursor: pointer;
-    transition: background 0.2s;
+    opacity: 1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #4a90e2; /* Increased fill width to ensure it works at value 10 */
+}
+
+/* For Firefox */
+.slider::-moz-range-track {
+    height: 10px;
+    border-radius: 5px;
+    background: #e0e0e0;
 }
 
 .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    background: var(--primary-color);
+    background: white;
     cursor: pointer;
-    transition: background 0.2s;
+    opacity: 1;
 }
 
-.slider:hover::-webkit-slider-thumb {
-    background: var(--secondary-color);
+.slider::-moz-range-progress {
+    background-color: #4a90e2;
+    height: 10px;
+    border-radius: 5px 0 0 5px;
 }
 
-.slider:hover::-moz-range-thumb {
-    background: var(--secondary-color);
+/* Different colors for different sliders */
+#mood::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #ff9800;
+}
+#exercise::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #4caf50;
+}
+#sleep::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #9c27b0;
+}
+#diet::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #8bc34a;
+}
+#portfolio::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #2196f3;
+}
+#job::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #607d8b;
+}
+#social::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #e91e63;
+}
+#alcohol::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #795548;
+}
+#sunlight::-webkit-slider-thumb {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), -1000px 0 0 990px #ffc107;
 }
 
+/* Firefox progress colors */
+#mood::-moz-range-progress {
+    background-color: #ff9800;
+}
+#exercise::-moz-range-progress {
+    background-color: #4caf50;
+}
+#sleep::-moz-range-progress {
+    background-color: #9c27b0;
+}
+#diet::-moz-range-progress {
+    background-color: #8bc34a;
+}
+#portfolio::-moz-range-progress {
+    background-color: #2196f3;
+}
+#job::-moz-range-progress {
+    background-color: #607d8b;
+}
+#social::-moz-range-progress {
+    background-color: #e91e63;
+}
+#alcohol::-moz-range-progress {
+    background-color: #795548;
+}
+#sunlight::-moz-range-progress {
+    background-color: #ffc107;
+}
+
+/* Slider value and labels */
 .slider-value {
     display: inline-block;
     width: 25px;

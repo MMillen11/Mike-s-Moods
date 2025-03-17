@@ -16,7 +16,7 @@ A comprehensive web application for tracking daily mood and various lifestyle fa
 
 ```
 Mike's Moods/
-├── index.html              # Main application entry point
+├── index.html              # Main application entry point (root directory)
 ├── frontend/
 │   ├── js/
 │   │   ├── app.js          # Main application logic

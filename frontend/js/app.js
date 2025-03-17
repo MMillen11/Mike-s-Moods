@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             portfolio: parseInt(formData.get('portfolio')),
             job: parseInt(formData.get('job')),
             social: parseInt(formData.get('social')),
-            alcohol: parseInt(formData.get('alcohol')),
+            alcohol: parseInt(formData.get('alcohol')), // Now 1 = 0 drinks, 10 = 10+ drinks
             sunlight: parseInt(formData.get('sunlight')),
             weather: formData.get('weather')
         };
