@@ -127,7 +127,7 @@ function proxyRequest(req, res) {
 }
 
 server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Mike's Moods app running at http://localhost:${PORT}/`);
     console.log(`API requests will be proxied to http://${BACKEND_HOST}:${BACKEND_PORT}/`);
     console.log(`Press Ctrl+C to stop the server`);
 }); 

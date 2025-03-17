@@ -1,4 +1,4 @@
-# Mood Tracker Application
+# Mike's Moods
 
 A comprehensive web application for tracking daily mood and various lifestyle factors to discover patterns and correlations.
 
@@ -15,7 +15,7 @@ A comprehensive web application for tracking daily mood and various lifestyle fa
 ## Project Structure
 
 ```
-Mood Tracker/
+Mike's Moods/
 ├── index.html              # Main application entry point
 ├── frontend/
 │   ├── js/
