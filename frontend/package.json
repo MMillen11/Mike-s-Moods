@@ -1,0 +1,13 @@
+{
+  "name": "mood-tracker-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Mood Tracker application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
+} 
