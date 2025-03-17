@@ -20,24 +20,6 @@
         return weatherConditions[getRandomInt(0, weatherConditions.length - 1)];
     }
     
-    // Function to generate random notes
-    function getRandomNotes() {
-        const notes = [
-            'Feeling productive today!',
-            'Had a great workout session.',
-            'Stressful day at work.',
-            'Spent time with friends.',
-            'Relaxing day at home.',
-            'Didn\'t sleep well last night.',
-            'Great day overall!',
-            'Feeling a bit under the weather.',
-            'Productive meeting with the team.',
-            'Enjoyed some time outdoors.',
-            ''  // Empty notes sometimes
-        ];
-        return notes[getRandomInt(0, notes.length - 1)];
-    }
-    
     // Generate 30 random mood entries
     const randomEntries = [];
     const usedDates = new Set(); // To avoid duplicate dates
@@ -51,23 +33,36 @@
         } while (usedDates.has(date));
         usedDates.add(date);
         
-        // Generate random values with some realistic correlations
-        const exercise = getRandomInt(1, 10);
+        // Generate sleep and sunlight values first - these will strongly influence mood
         const sleep = getRandomInt(1, 10);
+        const sunlight = getRandomInt(1, 10);
+        
+        // Generate other variables with normal distribution
+        const exercise = getRandomInt(1, 10);
         const diet = getRandomInt(1, 10);
-        
-        // Make mood somewhat correlated with exercise, sleep, and diet
-        // Higher values in these tend to lead to better mood
-        let moodBase = (exercise + sleep + diet) / 3;
-        // Add some randomness
-        let mood = Math.min(10, Math.max(1, Math.round(moodBase + getRandomInt(-3, 3))));
-        
-        // Other variables with some loose correlations
         const portfolio = getRandomInt(1, 10);
         const job = getRandomInt(1, 10);
         const social = getRandomInt(1, 10);
         const alcohol = getRandomInt(1, 10); // Remember: 10 = no alcohol, 1 = high consumption
-        const sunlight = getRandomInt(1, 10);
+        
+        // Calculate mood with stronger correlation to sleep and sunlight
+        // Sleep and sunlight have 2x the weight of other factors
+        const sleepWeight = 0.35; // 35% influence
+        const sunlightWeight = 0.35; // 35% influence
+        const otherWeight = 0.30 / 5; // 30% divided among 5 other factors
+        
+        let moodBase = (
+            sleep * sleepWeight + 
+            sunlight * sunlightWeight + 
+            exercise * otherWeight + 
+            diet * otherWeight + 
+            portfolio * otherWeight + 
+            job * otherWeight + 
+            social * otherWeight
+        );
+        
+        // Add a small random factor (but smaller than before to maintain correlation)
+        let mood = Math.min(10, Math.max(1, Math.round(moodBase + getRandomInt(-1, 1))));
         
         // Create the entry
         randomEntries.push({
@@ -82,8 +77,7 @@
             social: social,
             alcohol: alcohol,
             sunlight: sunlight,
-            weather: getRandomWeather(),
-            notes: getRandomNotes()
+            weather: getRandomWeather()
         });
     }
     

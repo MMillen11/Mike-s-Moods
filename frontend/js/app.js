@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if we have entries to show visualizations
     if (moodEntries.length > 0) {
         visualizationSection.classList.remove('hidden');
-        renderVisualization('all-data');
+        renderVisualization('mood-trends'); // Default to Comprehensive Chart
     }
     
     // Fetch weather data and update background
@@ -191,8 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
             existingWeatherInfo.remove();
         }
         
-        // Add the weather info to the header
-        document.querySelector('header').appendChild(weatherInfoContainer);
+        // Add the weather info below the weather dropdown
+        const weatherNote = document.querySelector('.weather-note');
+        if (weatherNote) {
+            weatherNote.after(weatherInfoContainer);
+            
+            // Update styles for the weather info when placed in the form
+            weatherInfoContainer.style.position = 'static';
+            weatherInfoContainer.style.margin = '10px 0';
+            weatherInfoContainer.style.width = '100%';
+            weatherInfoContainer.style.boxSizing = 'border-box';
+        }
         
         // Update the weather dropdown in the form to match current weather
         const weatherSelect = document.getElementById('weather');
@@ -230,8 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             social: parseInt(formData.get('social')),
             alcohol: parseInt(formData.get('alcohol')),
             sunlight: parseInt(formData.get('sunlight')),
-            weather: formData.get('weather'),
-            notes: formData.get('notes')
+            weather: formData.get('weather')
         };
         
         // Save entry to array and localStorage
@@ -254,8 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show visualization section if it was hidden
         visualizationSection.classList.remove('hidden');
         
-        // Update visualizations
-        renderVisualization('all-data');
+        // Update visualizations - now showing Comprehensive Chart by default
+        renderVisualization('mood-trends');
         
         // Send data to backend
         sendDataToBackend(entryData);
@@ -335,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCorrelationsChart();
                 break;
             default:
-                renderAllDataTable();
+                renderComprehensiveChart(); // Default to Comprehensive Chart
         }
     }
     
@@ -418,8 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
             moodEntries = moodEntries.filter(entry => entry.id !== id);
             localStorage.setItem('moodEntries', JSON.stringify(moodEntries));
             
-            // Update visualization
-            renderVisualization('all-data');
+            // Update visualization - now showing Comprehensive Chart instead of All Data
+            renderVisualization('mood-trends');
             
             // Hide visualization section if no entries left
             if (moodEntries.length === 0) {
