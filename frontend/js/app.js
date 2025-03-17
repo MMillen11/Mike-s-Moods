@@ -295,6 +295,35 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Add a clear data button at the top of the visualization section
+        const clearDataContainer = document.createElement('div');
+        clearDataContainer.className = 'clear-data-container';
+        clearDataContainer.style.textAlign = 'right';
+        clearDataContainer.style.marginBottom = '15px';
+        
+        const clearDataBtn = document.createElement('button');
+        clearDataBtn.textContent = 'Clear All Data';
+        clearDataBtn.className = 'btn-danger';
+        clearDataBtn.style.padding = '8px 15px';
+        clearDataBtn.style.backgroundColor = '#dc3545';
+        clearDataBtn.style.color = 'white';
+        clearDataBtn.style.border = 'none';
+        clearDataBtn.style.borderRadius = '4px';
+        clearDataBtn.style.cursor = 'pointer';
+        clearDataBtn.style.transition = 'background-color 0.3s';
+        
+        clearDataBtn.addEventListener('mouseover', () => {
+            clearDataBtn.style.backgroundColor = '#bd2130';
+        });
+        
+        clearDataBtn.addEventListener('mouseout', () => {
+            clearDataBtn.style.backgroundColor = '#dc3545';
+        });
+        
+        clearDataBtn.addEventListener('click', clearAllData);
+        clearDataContainer.appendChild(clearDataBtn);
+        chartsContainer.appendChild(clearDataContainer);
+        
         switch (type) {
             case 'all-data':
                 renderAllDataTable();
@@ -424,7 +453,21 @@ document.addEventListener('DOMContentLoaded', () => {
         chartsContainer.appendChild(chartContainer);
         
         // Prepare data for the chart
-        const sortedEntries = [...moodEntries].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sortedEntries = [...moodEntries].sort((a, b) => {
+            // Ensure proper date comparison by converting strings to Date objects
+            return new Date(a.date) - new Date(b.date);
+        });
+        
+        // Check if we have an entry for today
+        const today = new Date();
+        const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+        const hasEntryForToday = moodEntries.some(entry => {
+            const entryDate = new Date(entry.date);
+            const entryFormatted = `${entryDate.getMonth() + 1}/${entryDate.getDate()}/${entryDate.getFullYear()}`;
+            return entryFormatted === todayFormatted;
+        });
+        
+        console.log('Has entry for today:', hasEntryForToday, 'Today:', todayFormatted);
         
         // Limit to last 90 days if needed
         const limitedEntries = sortedEntries.length > 90 ? sortedEntries.slice(-90) : sortedEntries;
@@ -433,8 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateGroups = {};
         
         limitedEntries.forEach(entry => {
-            const date = new Date(entry.date);
-            const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+            // Ensure we're working with a proper Date object
+            const entryDate = new Date(entry.date);
+            const formattedDate = `${entryDate.getMonth() + 1}/${entryDate.getDate()}/${entryDate.getFullYear()}`;
             
             if (!dateGroups[formattedDate]) {
                 dateGroups[formattedDate] = [];
@@ -444,7 +488,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Calculate average values for each date
-        const dates = Object.keys(dateGroups).sort((a, b) => new Date(a) - new Date(b));
+        const dates = Object.keys(dateGroups).sort((a, b) => {
+            // Parse dates in MM/DD/YYYY format
+            const [monthA, dayA, yearA] = a.split('/').map(Number);
+            const [monthB, dayB, yearB] = b.split('/').map(Number);
+            
+            // Create Date objects with the correct parts
+            const dateA = new Date(yearA, monthA - 1, dayA);
+            const dateB = new Date(yearB, monthB - 1, dayB);
+            
+            return dateA - dateB;
+        });
+        
+        console.log('Dates for chart:', dates);
         
         // Define all variables to track
         const variables = [
@@ -480,6 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 hidden: !variable.visible
             };
         });
+        
+        console.log('Chart datasets:', datasets.map(d => ({ label: d.label, dataPoints: d.data.length })));
         
         // Create the chart
         const ctx = document.getElementById('comprehensive-chart').getContext('2d');
@@ -592,178 +650,176 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Render correlations chart using Chart.js
     function renderCorrelationsChart() {
-        // Create containers for the charts
+        // Create container for the weather-mood chart
         const chartDiv = document.createElement('div');
         chartDiv.className = 'chart-container';
         
-        // Define the variables to analyze
-        const variables = [
-            { name: 'Exercise', key: 'exercise' },
-            { name: 'Sleep', key: 'sleep' },
-            { name: 'Diet', key: 'diet' },
-            { name: 'Portfolio', key: 'portfolio' },
-            { name: 'Job', key: 'job' },
-            { name: 'Social', key: 'social' },
-            { name: 'Alcohol', key: 'alcohol' },
-            { name: 'Sunlight', key: 'sunlight' }
-        ];
-        
-        // Create a heatmap correlation matrix
+        // Create header for the weather-mood chart
         chartDiv.innerHTML = `
-            <h3>Variable and Mood Correlations</h3>
-            <div class="correlation-charts">
-                <div class="correlation-chart full-width">
-                    <h4>Correlation Between Variables and Mood</h4>
-                    <canvas id="correlation-scatter" width="800" height="400"></canvas>
-                </div>
-            </div>
-            <div class="correlation-charts" id="variable-charts">
-                <!-- Individual variable charts will be added here -->
+            <h3>Weather and Mood Relationship</h3>
+            <p class="chart-description">How different weather conditions affect your mood levels</p>
+            <div class="weather-mood-container">
+                <canvas id="weather-mood-chart"></canvas>
             </div>
         `;
         chartsContainer.appendChild(chartDiv);
         
-        // Create scatter plot for all variables vs mood
-        const scatterCtx = document.getElementById('correlation-scatter').getContext('2d');
+        // Define weather types and labels
+        const weatherTypes = ['sunny', 'cloudy', 'rainy', 'snowy', 'stormy'];
+        const labels = ['Sunny', 'Cloudy', 'Rainy', 'Snowy', 'Stormy'];
         
-        // Prepare datasets for each variable
-        const datasets = variables.map(variable => {
-            return {
-                label: variable.name,
-                data: moodEntries.map(entry => ({
-                    x: entry[variable.key],
-                    y: entry.mood
-                })),
-                backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.7)`,
-                pointRadius: 6,
-                pointHoverRadius: 8
-            };
+        // Define custom colors for each weather type
+        const weatherColors = {
+            'sunny': '#FFD700',  // Yellow
+            'cloudy': '#A9A9A9', // Gray
+            'rainy': '#4682B4',  // Blue
+            'snowy': '#ADD8E6',  // Light Blue
+            'stormy': '#8A2BE2'  // Purple
+        };
+        
+        // Calculate average mood for each weather type
+        const weatherMoodData = [];
+        const weatherCounts = [];
+        
+        weatherTypes.forEach(weatherType => {
+            const entriesWithWeather = moodEntries.filter(entry => entry.weather === weatherType);
+            weatherCounts.push(entriesWithWeather.length);
+            
+            if (entriesWithWeather.length === 0) {
+                weatherMoodData.push(null); // No entries for this weather type
+            } else {
+                const totalMood = entriesWithWeather.reduce((sum, entry) => sum + entry.mood, 0);
+                weatherMoodData.push(totalMood / entriesWithWeather.length);
+            }
         });
         
-        new Chart(scatterCtx, {
-            type: 'scatter',
+        // Check if we have any real data
+        const hasRealData = weatherMoodData.some(value => value !== null);
+        
+        // If no real data, use sample data
+        const finalData = hasRealData 
+            ? weatherMoodData.map(value => value === null ? 0 : value) 
+            : [7.5, 6.2, 5.0, 4.8, 3.5];
+        
+        // Create the chart
+        const ctx = document.getElementById('weather-mood-chart').getContext('2d');
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
             data: {
-                datasets: datasets
+                labels: labels,
+                datasets: [{
+                    label: 'Average Mood',
+                    data: finalData,
+                    backgroundColor: weatherTypes.map(type => weatherColors[type]),
+                    borderWidth: 1
+                }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Variables vs. Mood Rating'
+                    legend: {
+                        display: false
                     },
                     tooltip: {
                         callbacks: {
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].label + ' Weather';
+                            },
                             label: function(context) {
-                                return `${context.dataset.label}: ${context.raw.x}, Mood: ${context.raw.y}`;
+                                const weatherType = weatherTypes[context.dataIndex];
+                                const count = weatherCounts[context.dataIndex];
+                                
+                                if (hasRealData && count > 0) {
+                                    return [
+                                        `Average Mood: ${context.raw.toFixed(1)}`,
+                                        `Entries: ${count}`
+                                    ];
+                                } else {
+                                    return 'Sample Data (No entries yet)';
+                                }
                             }
                         }
-                    },
-                    legend: {
-                        position: 'top',
                     }
                 },
                 scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        title: {
+                            display: true,
+                            text: 'Average Mood Level (1-10)'
+                        }
+                    },
                     x: {
                         title: {
                             display: true,
-                            text: 'Variable Rating (1-10)'
-                        },
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Mood Rating (1-10)'
-                        },
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                            stepSize: 1
+                            text: 'Weather Condition'
                         }
                     }
                 }
             }
         });
         
-        // Create individual charts for each variable
-        const variableChartsContainer = document.getElementById('variable-charts');
-        
-        // Create scatter plots for each variable vs mood
-        variables.forEach(variable => {
-            const chartContainer = document.createElement('div');
-            chartContainer.className = 'correlation-chart';
-            chartContainer.innerHTML = `
-                <h4>${variable.name} and Mood</h4>
-                <canvas id="${variable.key}-mood-chart" width="400" height="300"></canvas>
-            `;
-            variableChartsContainer.appendChild(chartContainer);
+        // Add a note if using sample data or a summary if using real data
+        if (!hasRealData) {
+            const note = document.createElement('p');
+            note.style.textAlign = 'center';
+            note.style.fontSize = '12px';
+            note.style.color = '#666';
+            note.style.marginTop = '10px';
+            note.textContent = 'Sample data shown. Add entries with different weather conditions to see your personal patterns.';
+            chartDiv.querySelector('.weather-mood-container').appendChild(note);
+        } else {
+            // Add a summary of the data
+            const summary = document.createElement('p');
+            summary.className = 'weather-summary-text';
+            summary.style.textAlign = 'center';
+            summary.style.fontSize = '14px';
+            summary.style.marginTop = '15px';
             
-            // Calculate correlation coefficient
-            const data = moodEntries.map(entry => ({
-                x: entry[variable.key],
-                y: entry.mood
-            }));
+            // Find the weather with the highest average mood
+            let highestMoodWeather = '';
+            let highestMoodValue = 0;
             
-            // Create the scatter plot
-            const ctx = document.getElementById(`${variable.key}-mood-chart`).getContext('2d');
-            new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: variable.name,
-                        data: data,
-                        backgroundColor: getMoodColor(5),
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: data.map(point => getMoodColor(point.y))
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${variable.name}: ${context.raw.x}, Mood: ${context.raw.y}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: `${variable.name} Rating`
-                            },
-                            min: 0,
-                            max: 11,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Mood Rating'
-                            },
-                            min: 0,
-                            max: 11,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
+            weatherTypes.forEach((type, index) => {
+                if (weatherCounts[index] > 0 && finalData[index] > highestMoodValue) {
+                    highestMoodValue = finalData[index];
+                    highestMoodWeather = labels[index];
                 }
             });
-        });
+            
+            if (highestMoodWeather) {
+                summary.textContent = `Your mood tends to be highest during ${highestMoodWeather} weather (${highestMoodValue.toFixed(1)}/10).`;
+                chartDiv.querySelector('.weather-mood-container').appendChild(summary);
+            }
+        }
+    }
+    
+    // Function to clear all mood entries
+    function clearAllData() {
+        if (confirm('Are you sure you want to delete ALL mood entries? This cannot be undone.')) {
+            // Clear the mood entries array
+            moodEntries = [];
+            
+            // Update localStorage
+            localStorage.removeItem('moodEntries');
+            
+            // Hide visualization section
+            visualizationSection.classList.add('hidden');
+            
+            // Show confirmation message
+            alert('All mood entries have been deleted.');
+            
+            // Send delete request to backend (if applicable)
+            fetch('/api/mood-entries', {
+                method: 'DELETE'
+            }).catch(error => {
+                console.error('Error deleting all entries from server:', error);
+                // This is non-critical, so we don't need to show an error to the user
+            });
+        }
     }
 });
 

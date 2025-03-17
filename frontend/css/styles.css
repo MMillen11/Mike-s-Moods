@@ -411,4 +411,36 @@ footer {
         margin: 10px auto;
         width: fit-content;
     }
+}
+
+/* Weather-Mood Chart Styles */
+.weather-mood-container {
+    width: 100%;
+    height: 500px;
+    margin: 30px auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+}
+
+.chart-description {
+    text-align: center;
+    margin: 10px 0 20px;
+    font-style: italic;
+    color: var(--secondary-color);
+}
+
+.weather-summary-text {
+    text-align: center;
+    margin-top: 20px;
+    font-style: italic;
+    color: var(--secondary-color);
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .weather-mood-container {
+        height: 400px;
+    }
 } 
