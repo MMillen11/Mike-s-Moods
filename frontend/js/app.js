@@ -654,6 +654,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             legendContainer.appendChild(legendItem);
         });
+        
+        // Add the Deep Dive button
+        const deepDiveContainer = document.createElement('div');
+        deepDiveContainer.style.textAlign = 'center';
+        deepDiveContainer.style.marginTop = '30px';
+
+        const deepDiveButton = document.createElement('button');
+        deepDiveButton.className = 'deep-dive-button';
+        deepDiveButton.innerHTML = '🧠 Deep Dive Analysis';
+        deepDiveButton.addEventListener('click', handleDeepDiveClick);
+
+        deepDiveContainer.appendChild(deepDiveButton);
+        chartContainer.appendChild(deepDiveContainer);
     }
     
     // Render correlations chart using Chart.js
@@ -828,6 +841,227 @@ document.addEventListener('DOMContentLoaded', () => {
                 // This is non-critical, so we don't need to show an error to the user
             });
         }
+    }
+
+    // Handle the Deep Dive button click
+    async function handleDeepDiveClick() {
+        const button = document.querySelector('.deep-dive-button');
+        
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<span class="loading-spinner"></span> Analyzing your data...';
+        
+        try {
+            // Prepare the data for analysis
+            const analysisData = prepareDataForAnalysis(moodEntries);
+            
+            // Call your backend API
+            const response = await fetch('http://localhost:3000/api/analyze-mood', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(analysisData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to get analysis');
+            }
+            
+            const data = await response.json();
+            showInsightsModal(data.insights);
+        } catch (error) {
+            console.error('Error during deep dive analysis:', error);
+            alert('Sorry, we encountered an error analyzing your mood data. Please try again later.');
+        } finally {
+            // Reset button state
+            button.disabled = false;
+            button.innerHTML = '🧠 Deep Dive Analysis';
+        }
+    }
+
+    // Prepare mood data for analysis
+    function prepareDataForAnalysis(entries) {
+        if (entries.length === 0) {
+            return { stats: { totalEntries: 0 } };
+        }
+        
+        // Calculate basic statistics
+        const moodAvg = entries.reduce((sum, entry) => sum + entry.mood, 0) / entries.length;
+        
+        // Calculate day of week distribution
+        const dayOfWeekData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+        const dayOfWeekMoods = [[], [], [], [], [], [], []];
+        
+        entries.forEach(entry => {
+            const date = new Date(entry.date);
+            const dayOfWeek = date.getDay();
+            dayOfWeekData[dayOfWeek]++;
+            dayOfWeekMoods[dayOfWeek].push(entry.mood);
+        });
+        
+        // Calculate average mood by day of week
+        const dayOfWeekMoodAvg = dayOfWeekMoods.map(moods => 
+            moods.length ? moods.reduce((sum, mood) => sum + mood, 0) / moods.length : 0
+        );
+        
+        // Calculate correlations between mood and other factors
+        const factors = ['exercise', 'sleep', 'diet', 'portfolio', 'job', 'social', 'alcohol', 'sunlight'];
+        const correlations = {};
+        
+        factors.forEach(factor => {
+            const correlation = calculateCorrelation(
+                entries.map(entry => entry.mood),
+                entries.map(entry => entry[factor])
+            );
+            correlations[factor] = correlation;
+        });
+        
+        // Weather impact
+        const weatherTypes = ['sunny', 'cloudy', 'rainy', 'snowy', 'stormy'];
+        const weatherMoods = {};
+        
+        weatherTypes.forEach(type => {
+            const weatherEntries = entries.filter(entry => entry.weather === type);
+            if (weatherEntries.length > 0) {
+                weatherMoods[type] = {
+                    count: weatherEntries.length,
+                    avgMood: weatherEntries.reduce((sum, entry) => sum + entry.mood, 0) / weatherEntries.length
+                };
+            }
+        });
+        
+        // Recent trends (last 7 days vs previous 7 days)
+        let recentTrend = null;
+        if (entries.length >= 14) {
+            const recent7 = entries.slice(-7);
+            const previous7 = entries.slice(-14, -7);
+            
+            const recent7Avg = recent7.reduce((sum, entry) => sum + entry.mood, 0) / 7;
+            const previous7Avg = previous7.reduce((sum, entry) => sum + entry.mood, 0) / 7;
+            
+            recentTrend = {
+                recent7Avg,
+                previous7Avg,
+                change: recent7Avg - previous7Avg,
+                percentChange: ((recent7Avg - previous7Avg) / previous7Avg) * 100
+            };
+        }
+        
+        // Return the prepared data
+        return {
+            stats: {
+                totalEntries: entries.length,
+                dateRange: {
+                    start: entries[0].date,
+                    end: entries[entries.length - 1].date
+                },
+                moodAvg,
+                dayOfWeekData,
+                dayOfWeekMoodAvg,
+                correlations,
+                weatherMoods,
+                recentTrend
+            },
+            // Include a sample of recent entries (last 10)
+            recentEntries: entries.slice(-10)
+        };
+    }
+
+    // Helper function to calculate correlation coefficient
+    function calculateCorrelation(xValues, yValues) {
+        const n = xValues.length;
+        
+        // Calculate means
+        const xMean = xValues.reduce((sum, val) => sum + val, 0) / n;
+        const yMean = yValues.reduce((sum, val) => sum + val, 0) / n;
+        
+        // Calculate covariance and standard deviations
+        let covariance = 0;
+        let xStdDev = 0;
+        let yStdDev = 0;
+        
+        for (let i = 0; i < n; i++) {
+            const xDiff = xValues[i] - xMean;
+            const yDiff = yValues[i] - yMean;
+            covariance += xDiff * yDiff;
+            xStdDev += xDiff * xDiff;
+            yStdDev += yDiff * yDiff;
+        }
+        
+        // Avoid division by zero
+        if (xStdDev === 0 || yStdDev === 0) return 0;
+        
+        // Calculate correlation coefficient
+        return covariance / (Math.sqrt(xStdDev) * Math.sqrt(yStdDev));
+    }
+
+    // Display the insights modal
+    function showInsightsModal(insights) {
+        // Create modal element
+        const modal = document.createElement('div');
+        modal.className = 'insights-modal';
+        
+        // Format the insights text with proper HTML
+        const formattedInsights = formatInsightsText(insights);
+        
+        // Create modal content
+        modal.innerHTML = `
+            <div class="insights-content">
+                <h2>Your Personalized Mood Analysis</h2>
+                <div class="insights-text">
+                    ${formattedInsights}
+                </div>
+                <button class="btn-close">Close</button>
+            </div>
+        `;
+        
+        // Add event listener to close button
+        document.body.appendChild(modal);
+        modal.querySelector('.btn-close').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        // Close when clicking outside the content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    // Format the insights text with proper HTML formatting
+    function formatInsightsText(text) {
+        // Convert plain text to HTML with proper formatting
+        let formatted = text
+            // Convert markdown-style headers to HTML
+            .replace(/^# (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^## (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^### (.*$)/gm, '<h4>$1</h4>')
+            
+            // Convert markdown-style lists to HTML
+            .replace(/^\* (.*$)/gm, '<li>$1</li>')
+            .replace(/^- (.*$)/gm, '<li>$1</li>')
+            .replace(/^(\d+)\. (.*$)/gm, '<li>$2</li>')
+            
+            // Wrap adjacent list items in ul tags
+            .replace(/(<li>.*<\/li>)\n(?=<li>)/g, '$1')
+            
+            // Convert paragraphs
+            .replace(/^(?!<h|<li|<ul|<\/ul>)(.*$)/gm, '<p>$1</p>')
+            
+            // Clean up empty paragraphs
+            .replace(/<p><\/p>/g, '');
+        
+        // Wrap lists in ul tags (simplified approach)
+        let hasLists = /<li>/.test(formatted);
+        if (hasLists) {
+            formatted = '<ul>' + formatted + '</ul>';
+            // Fix nested lists
+            formatted = formatted.replace(/<\/ul><ul>/g, '');
+        }
+        
+        return formatted;
     }
 });
 

@@ -1,133 +1,82 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+require('dotenv').config();
 
-const PORT = 5000;
-const BACKEND_PORT = 5001;
-const BACKEND_HOST = 'localhost';
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '1mb' }));
 
-const MIME_TYPES = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'text/javascript',
-    '.json': 'application/json',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml',
-    '.ico': 'image/x-icon'
-};
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const PORT = process.env.PORT || 3000;
 
-const server = http.createServer((req, res) => {
-    console.log(`Request: ${req.method} ${req.url}`);
+app.post('/api/analyze-mood', async (req, res) => {
+  try {
+    const moodData = req.body;
     
-    // Handle API requests (proxy to backend)
-    if (req.url.startsWith('/api/')) {
-        // Proxy the request to the Python backend
-        proxyRequest(req, res);
-        return;
-    }
+    console.log('Received mood data. Calling Anthropic API...');
     
-    // Normalize URL path
-    let filePath = req.url === '/' ? '/index.html' : req.url;
-    
-    // Check if the file is in the root directory first
-    let rootFilePath = path.join(__dirname, '..', filePath);
-    
-    // If the file doesn't exist in the root, look in the frontend directory
-    fs.access(rootFilePath, fs.constants.F_OK, (err) => {
-        if (err) {
-            // File not in root, try frontend directory
-            filePath = path.join(__dirname, filePath);
-            serveFile(filePath, res);
-        } else {
-            // File exists in root
-            serveFile(rootFilePath, res);
+    // Call Anthropic API with the correct format
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 1000,
+        system: "You are an expert in behavioral psychology and data analysis, helping analyze mood tracking data. Focus on identifying patterns, correlations, and providing actionable insights. Be specific, evidence-based, and compassionate in your analysis.",
+        messages: [
+          {
+            role: "user",
+            content: `Here is my mood tracking data from the past ${moodData.stats.totalEntries} days:
+            
+            ${JSON.stringify(moodData, null, 2)}
+            
+            Please analyze this data and provide:
+            1. The 3-5 most significant patterns you observe
+            2. Key correlations between my mood and other variables
+            3. Actionable recommendations based on the data
+            4. Any interesting insights about how external factors (weather, day of week) affect my mood
+            
+            Please format your response in clear sections with bullet points where appropriate.`
+          }
+        ]
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-beta': 'messages-2023-12-15',
+          'anthropic-version': '2023-06-01'
         }
-    });
+      }
+    );
+    
+    console.log('API response received successfully');
+    
+    // Check the structure of the response
+    if (response.data && response.data.content && response.data.content[0] && response.data.content[0].text) {
+      res.json({ insights: response.data.content[0].text });
+    } else {
+      console.error('Unexpected API response structure:', JSON.stringify(response.data));
+      res.json({ insights: "The AI generated a response but it was in an unexpected format. Please try again." });
+    }
+  } catch (error) {
+    console.error('Error calling Claude API:', error);
+    
+    if (error.response) {
+      console.error('API Error Response:', error.response.data);
+      res.status(500).json({ 
+        error: 'Failed to generate insights', 
+        details: error.response.data 
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'Failed to generate insights', 
+        message: error.message 
+      });
+    }
+  }
 });
 
-// Function to serve a file
-function serveFile(filePath, res) {
-    // Get file extension
-    const extname = path.extname(filePath).toLowerCase();
-    
-    // Set content type based on file extension
-    const contentType = MIME_TYPES[extname] || 'application/octet-stream';
-    
-    // Read file
-    fs.readFile(filePath, (err, content) => {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                // File not found
-                fs.readFile(path.join(__dirname, '..', 'index.html'), (err, content) => {
-                    if (err) {
-                        // Try the frontend directory
-                        fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
-                            if (err) {
-                                // Something went very wrong
-                                res.writeHead(500);
-                                res.end('Server Error');
-                            } else {
-                                // Return index.html for client-side routing
-                                res.writeHead(200, { 'Content-Type': 'text/html' });
-                                res.end(content, 'utf-8');
-                            }
-                        });
-                    } else {
-                        // Return index.html from root for client-side routing
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.end(content, 'utf-8');
-                    }
-                });
-            } else {
-                // Server error
-                res.writeHead(500);
-                res.end(`Server Error: ${err.code}`);
-            }
-        } else {
-            // Success
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
-        }
-    });
-}
-
-// Function to proxy requests to the backend
-function proxyRequest(req, res) {
-    const options = {
-        hostname: BACKEND_HOST,
-        port: BACKEND_PORT,
-        path: req.url,
-        method: req.method,
-        headers: {
-            ...req.headers,
-            host: `${BACKEND_HOST}:${BACKEND_PORT}`
-        }
-    };
-
-    const proxyReq = http.request(options, (proxyRes) => {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
-        proxyRes.pipe(res, { end: true });
-    });
-
-    proxyReq.on('error', (err) => {
-        console.error('Proxy request error:', err);
-        res.writeHead(502);
-        res.end('Bad Gateway - Backend server may be down');
-    });
-
-    // If the original request has a body, pipe it to the proxy request
-    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-        req.pipe(proxyReq, { end: true });
-    } else {
-        proxyReq.end();
-    }
-}
-
-server.listen(PORT, () => {
-    console.log(`Mike's Moods app running at http://localhost:${PORT}/`);
-    console.log(`API requests will be proxied to http://${BACKEND_HOST}:${BACKEND_PORT}/`);
-    console.log(`Press Ctrl+C to stop the server`);
-}); 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
