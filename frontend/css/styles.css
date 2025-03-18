@@ -538,15 +538,33 @@ footer {
     }
     
     .header-container {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        justify-content: space-between;
     }
     
     .header-icon {
-        height: 80px;
+        height: 60px;
+        margin: 0 10px;
+    }
+    
+    .beaker-icon {
+        height: 65px;
+        order: 1;
     }
     
     .colorful-title {
-        font-size: 48px;
+        font-size: 40px;
+        order: 2;
+        margin: 0 5px;
+    }
+    
+    .title-line {
+        margin-bottom: 5px;
+    }
+    
+    .ruler-icon {
+        height: 65px;
+        order: 3;
     }
     
     #mood-entry-form, #data-visualization {
@@ -608,6 +626,30 @@ footer {
     .data-table td:nth-child(2) {
         left: 80px;
         z-index: 1;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+    .header-container {
+        padding: 10px 0;
+    }
+    
+    .header-icon {
+        height: 50px;
+        margin: 0 5px;
+    }
+    
+    .beaker-icon {
+        height: 55px;
+    }
+    
+    .ruler-icon {
+        height: 55px;
+    }
+    
+    .colorful-title {
+        font-size: 32px;
     }
 }
 
