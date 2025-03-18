@@ -528,6 +528,43 @@ footer {
         margin: 10px auto;
         width: fit-content;
     }
+
+    /* Mobile-friendly data table styles */
+    .data-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 14px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table th, 
+    .data-table td {
+        padding: 8px;
+    }
+
+    /* Optional: Priority columns for very small screens */
+    .data-table th:nth-child(1),
+    .data-table td:nth-child(1),
+    .data-table th:nth-child(2),
+    .data-table td:nth-child(2),
+    .data-table th:nth-child(12),
+    .data-table td:nth-child(12) {
+        position: sticky;
+        background-color: inherit;
+    }
+
+    .data-table th:nth-child(1),
+    .data-table td:nth-child(1) {
+        left: 0;
+        z-index: 2;
+    }
+
+    .data-table th:nth-child(2),
+    .data-table td:nth-child(2) {
+        left: 80px;
+        z-index: 1;
+    }
 }
 
 /* Weather-Mood Chart Styles */

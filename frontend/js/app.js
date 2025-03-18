@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Set default date to today
     const today = new Date();
-    const formattedDate = today.toISOString().substr(0, 10);
+    // Format date properly without timezone issues 
+    const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     dateInput.value = formattedDate;
     
     // Initialize mood entries array from localStorage or empty array if none exists
@@ -227,9 +228,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Get form data
         const formData = new FormData(moodForm);
+        
+        // Get date from form and ensure it's correctly formatted
+        const dateValue = formData.get('date');
+        let formattedDate = dateValue;
+        
+        // If there's any timezone issue, reformat the date properly
+        if (dateValue) {
+            const dateParts = dateValue.split('-');
+            if (dateParts.length === 3) {
+                // Create a date using year, month-1 (0-indexed), day
+                const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            }
+        }
+        
         const entryData = {
             id: Date.now(), // Unique ID based on timestamp
-            date: formData.get('date'),
+            date: formattedDate,
             mood: parseInt(formData.get('mood')),
             exercise: parseInt(formData.get('exercise')),
             sleep: parseInt(formData.get('sleep')),
