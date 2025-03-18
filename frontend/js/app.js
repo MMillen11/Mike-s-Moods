@@ -285,6 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Send data to backend
         sendDataToBackend(entryData);
+        
+        // Show video recommendations based on metric input
+        showVideoRecommendations(entryData);
     }
     
     // Function to send data to backend
@@ -308,6 +311,241 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => {
             console.error('Error sending data to server:', error);
             // We still keep the data in localStorage for offline functionality
+        });
+    }
+    
+    // Function to show video recommendations based on metric input
+    function showVideoRecommendations(metricData) {
+        // Only show video if alcohol consumption is 8 or higher
+        if (metricData.alcohol < 8) {
+            return; // Exit the function if alcohol level is less than 8
+        }
+        
+        // Array of verified available videos about alcohol's effects
+        const alcoholVideos = [
+            {
+                title: "Alcohol and Health: How It Affects Your Liver, Heart and More",
+                videoId: "CJynHWYo7D8",
+                description: "Expert explanation of alcohol's effects on your body systems"
+            },
+            {
+                title: "Does Alcohol Affect Your Sleep? | Andrew Huberman",
+                videoId: "nm1TxQj9IsQ",
+                description: "How alcohol disrupts your sleep quality and recovery"
+            },
+            {
+                title: "Effects of Alcohol on the Brain, Body & Health | Andrew Huberman",
+                videoId: "DkS1pkKpILY",
+                description: "Dr. Huberman explains alcohol's effects on your body and brain"
+            },
+            {
+                title: "How Alcohol Hijacks Your Dopamine System | Andrew Huberman",
+                videoId: "EEOM8hLMdHg",
+                description: "Dr. Huberman explains how alcohol affects your brain's reward system"
+            }
+        ];
+        
+        // Select a random video from the array
+        const randomIndex = Math.floor(Math.random() * alcoholVideos.length);
+        const video = alcoholVideos[randomIndex];
+        
+        // Create recommendation popup
+        const popup = document.createElement('div');
+        popup.className = 'video-recommendation-popup';
+        popup.innerHTML = `
+            <div class="video-recommendation-content">
+                <h3>Health Information About Alcohol Consumption</h3>
+                <p>Based on your reported alcohol consumption level (${metricData.alcohol}/10), we recommend watching this educational video:</p>
+                <h4>${video.title}</h4>
+                
+                <div class="video-container">
+                    <iframe 
+                        id="alcohol-video"
+                        width="560" 
+                        height="315" 
+                        src="https://www.youtube.com/embed/${video.videoId}?rel=0&modestbranding=1" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="video-description">${video.description}</p>
+                
+                <div class="backup-container">
+                    <p><strong>Can't see the video?</strong> <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">Open in YouTube</a></p>
+                </div>
+                
+                <div class="health-info-container">
+                    <h4>Health Effects of Alcohol Consumption</h4>
+                    <ul class="health-effects-list">
+                        <li><strong>Brain Function:</strong> Alcohol interferes with communication pathways in the brain, affecting mood, behavior, and cognitive function.</li>
+                        <li><strong>Sleep Quality:</strong> While alcohol can help you fall asleep initially, it disrupts REM sleep and overall sleep quality.</li>
+                        <li><strong>Liver Function:</strong> Regular consumption forces your liver to prioritize alcohol metabolism over other functions, potentially leading to fatty liver and inflammation.</li>
+                        <li><strong>Heart Health:</strong> High consumption can lead to high blood pressure, irregular heartbeat, and increased risk of stroke.</li>
+                        <li><strong>Immune System:</strong> Alcohol can weaken your immune system, making you more susceptible to infections.</li>
+                    </ul>
+                    
+                    <h4>Benefits of Reducing Alcohol Consumption</h4>
+                    <ul class="benefits-list">
+                        <li>Improved sleep quality and energy levels</li>
+                        <li>Better mental clarity and mood stability</li>
+                        <li>Enhanced immune function</li>
+                        <li>Improved liver health and function</li>
+                        <li>Reduced risk of various health conditions</li>
+                    </ul>
+                </div>
+                
+                <button class="btn-close-video">Close</button>
+            </div>
+        `;
+        
+        // Add to document
+        document.body.appendChild(popup);
+        
+        // Add styles for the popup if they don't already exist
+        if (!document.getElementById('video-recommendation-styles')) {
+            const styleTag = document.createElement('style');
+            styleTag.id = 'video-recommendation-styles';
+            styleTag.textContent = `
+                .video-recommendation-popup {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
+                
+                .video-recommendation-content {
+                    background-color: white;
+                    border-radius: 10px;
+                    padding: 25px;
+                    max-width: 90%;
+                    width: 650px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+                }
+                
+                .video-recommendation-content h3 {
+                    color: #4a6fa5;
+                    margin-top: 0;
+                    text-align: center;
+                }
+                
+                .video-recommendation-content h4 {
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    color: #2c3e50;
+                }
+                
+                .upload-date {
+                    color: #666;
+                    font-size: 0.9em;
+                    margin-top: 0;
+                    font-style: italic;
+                }
+                
+                .video-container {
+                    position: relative;
+                    padding-bottom: 56.25%;
+                    height: 0;
+                    overflow: hidden;
+                    margin: 15px 0;
+                    border-radius: 6px;
+                    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                }
+                
+                .video-container iframe {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 6px;
+                }
+                
+                .backup-container {
+                    text-align: center;
+                    margin: 10px 0 20px;
+                    padding: 8px;
+                    background-color: #f8f9fa;
+                    border-radius: 4px;
+                    border: 1px solid #e9ecef;
+                }
+                
+                .backup-container a {
+                    color: #dc3545;
+                    font-weight: bold;
+                    text-decoration: none;
+                }
+                
+                .backup-container a:hover {
+                    text-decoration: underline;
+                }
+                
+                .health-info-container {
+                    background-color: #f8f9fa;
+                    border-radius: 8px;
+                    padding: 20px;
+                    margin: 15px 0;
+                }
+                
+                .health-effects-list li, .benefits-list li {
+                    margin-bottom: 8px;
+                    line-height: 1.5;
+                }
+                
+                .video-description {
+                    margin: 10px 0;
+                    font-style: italic;
+                    color: #555;
+                    text-align: center;
+                }
+                
+                .btn-close-video {
+                    display: block;
+                    background-color: #4a6fa5;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: background-color 0.3s;
+                    margin: 20px auto 0;
+                }
+                
+                .btn-close-video:hover {
+                    background-color: #3a5a8a;
+                }
+                
+                @media (max-width: 768px) {
+                    .video-recommendation-content {
+                        width: 95%;
+                        padding: 15px;
+                    }
+                }
+            `;
+            document.head.appendChild(styleTag);
+        }
+        
+        // Add close button event
+        popup.querySelector('.btn-close-video').addEventListener('click', () => {
+            popup.remove();
+        });
+        
+        // Also close when clicking outside the content
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                popup.remove();
+            }
         });
     }
     
