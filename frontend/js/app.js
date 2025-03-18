@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewAllDataBtn = document.getElementById('view-all-data');
     const viewMoodTrendsBtn = document.getElementById('view-mood-trends');
     const viewCorrelationsBtn = document.getElementById('view-correlations');
+    const viewCorrelationMatrixBtn = document.getElementById('view-correlation-matrix');
     
     // Set default date to today
     const today = new Date();
@@ -100,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     viewAllDataBtn.addEventListener('click', () => renderVisualization('all-data'));
     viewMoodTrendsBtn.addEventListener('click', () => renderVisualization('mood-trends'));
     viewCorrelationsBtn.addEventListener('click', () => renderVisualization('correlations'));
+    viewCorrelationMatrixBtn.addEventListener('click', () => renderVisualization('correlation-matrix'));
     
     // Check if we have entries to show visualizations
     if (moodEntries.length > 0) {
@@ -358,6 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'correlations':
                 renderCorrelationsChart();
                 break;
+            case 'correlation-matrix':
+                renderCorrelationMatrix();
+                break;
             default:
                 renderComprehensiveChart(); // Default to Comprehensive Chart
         }
@@ -494,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chartContainer = document.createElement('div');
         chartContainer.className = 'chart-container';
         chartContainer.innerHTML = `
-            <h3>Comprehensive Mood and Variables Over Time</h3>
+            <h3>Comprehensive Metrics Over Time</h3>
             <div style="position: relative; height: 600px;">
                 <canvas id="comprehensive-chart"></canvas>
             </div>
@@ -637,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Mood and Variables Over Time (90-Day View)',
+                        text: 'Metrics Over Time (90-Day View)',
                         font: {
                             size: 16
                         }
@@ -671,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         display: true,
                         title: {
                             display: true,
-                            text: 'Rating (1-10)'
+                            text: 'Metrics'
                         },
                         min: 0,
                         max: 11,
@@ -1138,6 +1143,284 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         return formatted;
+    }
+
+    // Render correlation matrix chart
+    function renderCorrelationMatrix() {
+        // Create container for the correlation matrix
+        const matrixContainer = document.createElement('div');
+        matrixContainer.className = 'chart-container';
+        
+        // Create header for the correlation matrix
+        matrixContainer.innerHTML = `
+            <h3>Correlation Matrix</h3>
+            <p class="chart-description">Relationship strength between different metrics (higher values indicate stronger correlations)</p>
+            <div class="correlation-matrix-container" style="margin: 20px auto; overflow-x: auto;">
+                <div id="correlation-matrix-table"></div>
+            </div>
+        `;
+        chartsContainer.appendChild(matrixContainer);
+        
+        // Define variables to include in the correlation matrix
+        const variables = [
+            { key: 'mood', name: 'Mood' },
+            { key: 'exercise', name: 'Exercise' },
+            { key: 'sleep', name: 'Sleep' },
+            { key: 'diet', name: 'Diet' },
+            { key: 'portfolio', name: 'Portfolio' },
+            { key: 'job', name: 'Job' },
+            { key: 'social', name: 'Social' },
+            { key: 'alcohol', name: 'Alcohol' },
+            { key: 'sunlight', name: 'Sunlight' }
+        ];
+        
+        // Only proceed if we have enough entries for meaningful correlations
+        if (moodEntries.length < 5) {
+            matrixContainer.querySelector('.correlation-matrix-container').innerHTML = `
+                <p style="text-align: center; padding: 20px;">
+                    Not enough data for meaningful correlations. Add at least 5 entries to see the correlation matrix.
+                </p>
+            `;
+            return;
+        }
+        
+        // Calculate correlation matrix
+        const correlationMatrix = [];
+        const variableNames = variables.map(v => v.name);
+        
+        // Calculate correlation for each variable pair
+        for (let i = 0; i < variables.length; i++) {
+            correlationMatrix[i] = [];
+            for (let j = 0; j < variables.length; j++) {
+                if (i === j) {
+                    // Diagonal elements (correlation with self) are always 1
+                    correlationMatrix[i][j] = 1;
+                } else {
+                    const correlation = calculateCorrelation(
+                        moodEntries.map(entry => entry[variables[i].key]),
+                        moodEntries.map(entry => entry[variables[j].key])
+                    );
+                    correlationMatrix[i][j] = parseFloat(correlation.toFixed(2));
+                }
+            }
+        }
+        
+        // Create a table to display the correlation matrix
+        const tableContainer = document.getElementById('correlation-matrix-table');
+        const table = document.createElement('table');
+        table.className = 'correlation-table';
+        table.style.borderCollapse = 'collapse';
+        table.style.width = '100%';
+        table.style.textAlign = 'center';
+        table.style.fontSize = '14px';
+        
+        // Create header row
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        // Empty cell in the top-left corner
+        const cornerCell = document.createElement('th');
+        cornerCell.style.backgroundColor = '#f5f7fa';
+        cornerCell.style.border = '1px solid #ddd';
+        cornerCell.style.padding = '10px';
+        headerRow.appendChild(cornerCell);
+        
+        // Add column headers
+        variableNames.forEach(name => {
+            const th = document.createElement('th');
+            th.textContent = name;
+            th.style.backgroundColor = '#f5f7fa';
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '10px';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        // Add rows with data
+        for (let i = 0; i < correlationMatrix.length; i++) {
+            const row = document.createElement('tr');
+            
+            // Add row header (variable name)
+            const th = document.createElement('th');
+            th.textContent = variableNames[i];
+            th.style.backgroundColor = '#f5f7fa';
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '10px';
+            th.style.textAlign = 'left';
+            row.appendChild(th);
+            
+            // Add correlation values
+            for (let j = 0; j < correlationMatrix[i].length; j++) {
+                const td = document.createElement('td');
+                td.textContent = correlationMatrix[i][j].toFixed(2);
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '10px';
+                
+                // Color based on correlation value
+                let cellColor;
+                const value = correlationMatrix[i][j];
+                
+                if (i === j) {
+                    // Diagonal (self-correlation) is always 1
+                    cellColor = '#f5f7fa';
+                } else if (value < -0.5) {
+                    cellColor = 'rgba(220, 53, 69, 0.8)'; // Strong negative - red
+                } else if (value < -0.3) {
+                    cellColor = 'rgba(220, 53, 69, 0.5)'; // Moderate negative - lighter red
+                } else if (value < -0.1) {
+                    cellColor = 'rgba(220, 53, 69, 0.3)'; // Weak negative - very light red
+                } else if (value < 0.1) {
+                    cellColor = 'rgba(255, 193, 7, 0.3)'; // Very weak/neutral - very light yellow
+                } else if (value < 0.3) {
+                    cellColor = 'rgba(40, 167, 69, 0.3)'; // Weak positive - very light green
+                } else if (value < 0.5) {
+                    cellColor = 'rgba(40, 167, 69, 0.5)'; // Moderate positive - lighter green
+                } else {
+                    cellColor = 'rgba(40, 167, 69, 0.8)'; // Strong positive - green
+                }
+                
+                td.style.backgroundColor = cellColor;
+                
+                // Make text color appropriate for background
+                if (value < -0.5 || value > 0.5) {
+                    td.style.color = 'white'; // White text on dark backgrounds
+                } else {
+                    td.style.color = 'black'; // Black text on light backgrounds
+                }
+                
+                row.appendChild(td);
+            }
+            
+            tbody.appendChild(row);
+        }
+        
+        table.appendChild(tbody);
+        tableContainer.appendChild(table);
+        
+        // Add a legend explaining correlation values
+        const legendContainer = document.createElement('div');
+        legendContainer.style.display = 'flex';
+        legendContainer.style.flexWrap = 'wrap';
+        legendContainer.style.justifyContent = 'center';
+        legendContainer.style.marginTop = '20px';
+        legendContainer.style.gap = '10px';
+        
+        const legendItems = [
+            { color: 'rgba(220, 53, 69, 0.8)', label: 'Strong Negative (< -0.5)' },
+            { color: 'rgba(220, 53, 69, 0.5)', label: 'Moderate Negative (-0.5 to -0.3)' },
+            { color: 'rgba(220, 53, 69, 0.3)', label: 'Weak Negative (-0.3 to -0.1)' },
+            { color: 'rgba(255, 193, 7, 0.3)', label: 'Very Weak/Neutral (-0.1 to 0.1)' },
+            { color: 'rgba(40, 167, 69, 0.3)', label: 'Weak Positive (0.1 to 0.3)' },
+            { color: 'rgba(40, 167, 69, 0.5)', label: 'Moderate Positive (0.3 to 0.5)' },
+            { color: 'rgba(40, 167, 69, 0.8)', label: 'Strong Positive (> 0.5)' }
+        ];
+        
+        legendItems.forEach(item => {
+            const legendItem = document.createElement('div');
+            legendItem.style.display = 'flex';
+            legendItem.style.alignItems = 'center';
+            legendItem.style.marginBottom = '5px';
+            
+            const colorBox = document.createElement('div');
+            colorBox.style.width = '20px';
+            colorBox.style.height = '20px';
+            colorBox.style.backgroundColor = item.color;
+            colorBox.style.marginRight = '5px';
+            colorBox.style.border = '1px solid #ddd';
+            
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            label.style.fontSize = '12px';
+            
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(label);
+            legendContainer.appendChild(legendItem);
+        });
+        
+        // Add explanation text
+        const explanationText = document.createElement('p');
+        explanationText.style.textAlign = 'center';
+        explanationText.style.marginTop = '20px';
+        explanationText.style.fontSize = '14px';
+        explanationText.innerHTML = `
+            <strong>How to interpret:</strong> Values close to 1 indicate a strong positive correlation (as one metric increases, the other tends to increase).
+            Values close to -1 indicate a strong negative correlation (as one metric increases, the other tends to decrease).
+            Values close to 0 indicate little to no correlation between the metrics.
+        `;
+        
+        matrixContainer.querySelector('.correlation-matrix-container').appendChild(legendContainer);
+        matrixContainer.querySelector('.correlation-matrix-container').appendChild(explanationText);
+        
+        // Add info about strongest correlations
+        const strongestCorrelations = findStrongestCorrelations(correlationMatrix, variableNames);
+        if (strongestCorrelations.positive.length > 0 || strongestCorrelations.negative.length > 0) {
+            const insightsDiv = document.createElement('div');
+            insightsDiv.style.marginTop = '30px';
+            insightsDiv.style.padding = '15px';
+            insightsDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            insightsDiv.style.borderRadius = '5px';
+            insightsDiv.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            
+            let insightsHTML = '<h4 style="margin-top: 0;">Key Insights</h4>';
+            
+            if (strongestCorrelations.positive.length > 0) {
+                insightsHTML += '<p><strong>Strongest positive correlations:</strong></p><ul>';
+                strongestCorrelations.positive.forEach(corr => {
+                    insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
+                });
+                insightsHTML += '</ul>';
+            }
+            
+            if (strongestCorrelations.negative.length > 0) {
+                insightsHTML += '<p><strong>Strongest negative correlations:</strong></p><ul>';
+                strongestCorrelations.negative.forEach(corr => {
+                    insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
+                });
+                insightsHTML += '</ul>';
+            }
+            
+            insightsDiv.innerHTML = insightsHTML;
+            matrixContainer.querySelector('.correlation-matrix-container').appendChild(insightsDiv);
+        }
+    }
+    
+    // Helper function to find the strongest correlations
+    function findStrongestCorrelations(matrix, varNames) {
+        const positiveCorrelations = [];
+        const negativeCorrelations = [];
+        
+        // Examine each unique pair
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = i + 1; j < matrix[i].length; j++) {
+                const value = matrix[i][j];
+                const pair = {
+                    var1: varNames[i],
+                    var2: varNames[j],
+                    value: value
+                };
+                
+                if (value >= 0.5) {
+                    positiveCorrelations.push(pair);
+                } else if (value <= -0.5) {
+                    negativeCorrelations.push(pair);
+                }
+            }
+        }
+        
+        // Sort by absolute value (strongest first)
+        positiveCorrelations.sort((a, b) => b.value - a.value);
+        negativeCorrelations.sort((a, b) => a.value - b.value);
+        
+        // Limit to top 3 of each
+        return {
+            positive: positiveCorrelations.slice(0, 3),
+            negative: negativeCorrelations.slice(0, 3)
+        };
     }
 });
 
