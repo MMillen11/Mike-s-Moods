@@ -1182,8 +1182,9 @@ document.addEventListener('DOMContentLoaded', () => {
         matrixContainer.innerHTML = `
             <h3>Correlation Matrix</h3>
             <p class="chart-description">Relationship strength between different metrics (higher values indicate stronger correlations)</p>
-            <div class="correlation-matrix-container" style="margin: 20px auto; overflow-x: auto;">
-                <div id="correlation-matrix-table"></div>
+            <div class="correlation-matrix-container">
+                <div class="correlation-matrix-chart" id="correlation-matrix-table"></div>
+                <p class="correlation-instructions">Scroll horizontally if needed to view the full matrix</p>
             </div>
         `;
         chartsContainer.appendChild(matrixContainer);
@@ -1331,11 +1332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add a legend explaining correlation values
         const legendContainer = document.createElement('div');
-        legendContainer.style.display = 'flex';
-        legendContainer.style.flexWrap = 'wrap';
-        legendContainer.style.justifyContent = 'center';
-        legendContainer.style.marginTop = '20px';
-        legendContainer.style.gap = '10px';
+        legendContainer.className = 'correlation-matrix-legend';
         
         const legendItems = [
             { color: 'rgba(220, 53, 69, 0.8)', label: 'Strong Negative (< -0.5)' },
@@ -1349,20 +1346,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         legendItems.forEach(item => {
             const legendItem = document.createElement('div');
-            legendItem.style.display = 'flex';
-            legendItem.style.alignItems = 'center';
-            legendItem.style.marginBottom = '5px';
+            legendItem.className = 'legend-item';
             
             const colorBox = document.createElement('div');
-            colorBox.style.width = '20px';
-            colorBox.style.height = '20px';
+            colorBox.className = 'legend-color';
             colorBox.style.backgroundColor = item.color;
-            colorBox.style.marginRight = '5px';
             colorBox.style.border = '1px solid #ddd';
             
             const label = document.createElement('span');
             label.textContent = item.label;
-            label.style.fontSize = '12px';
             
             legendItem.appendChild(colorBox);
             legendItem.appendChild(label);
@@ -1371,9 +1363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add explanation text
         const explanationText = document.createElement('p');
-        explanationText.style.textAlign = 'center';
-        explanationText.style.marginTop = '20px';
-        explanationText.style.fontSize = '14px';
+        explanationText.className = 'correlation-instructions';
         explanationText.innerHTML = `
             <strong>How to interpret:</strong> Values close to 1 indicate a strong positive correlation (as one metric increases, the other tends to increase).
             Values close to -1 indicate a strong negative correlation (as one metric increases, the other tends to decrease).

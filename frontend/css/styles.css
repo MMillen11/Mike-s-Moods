@@ -58,7 +58,7 @@ header h1 {
 
 /* Colorful Title Styles */
 .colorful-title {
-    font-size: 56px;
+    font-size: 62px;
     letter-spacing: 1px;
     line-height: 1.2;
     display: flex;
@@ -556,7 +556,7 @@ footer {
     }
     
     .colorful-title {
-        font-size: 36px;
+        font-size: 42px;
         order: 2;
         margin: 0;
         flex: 1 1 auto;
@@ -654,7 +654,7 @@ footer {
     }
     
     .colorful-title {
-        font-size: 28px;
+        font-size: 32px;
     }
     
     .title-line {
@@ -678,7 +678,7 @@ footer {
     }
     
     .colorful-title {
-        font-size: 24px;
+        font-size: 28px;
     }
 }
 
@@ -715,4 +715,95 @@ footer {
 }
 
 /* Weather Correlation Matrix Styles */
+.correlation-matrix-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.correlation-matrix-chart {
+    min-width: 600px;
+    height: 600px;
+    margin: 0 auto;
+}
+
+.correlation-matrix-legend {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 10px 10px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    border-radius: 3px;
+}
+
+.correlation-instructions {
+    text-align: center;
+    margin: 15px 0;
+    font-style: italic;
+    color: var(--secondary-color);
+}
+
+/* Mobile styles for Correlation Matrix */
+@media (max-width: 768px) {
+    .correlation-matrix-container {
+        padding: 15px 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .correlation-matrix-chart {
+        min-width: 500px;
+        height: 500px;
+    }
+    
+    .correlation-matrix-legend {
+        justify-content: flex-start;
+        padding: 0 10px;
+    }
+    
+    /* Add horizontal scroll hint */
+    .correlation-matrix-container::after {
+        content: "← Scroll to view full matrix →";
+        display: block;
+        text-align: center;
+        padding: 10px;
+        color: var(--secondary-color);
+        font-size: 14px;
+        font-style: italic;
+    }
+}
+
+@media (max-width: 380px) {
+    .correlation-matrix-chart {
+        min-width: 450px;
+        height: 450px;
+    }
+    
+    .legend-item {
+        margin: 0 5px 8px;
+        font-size: 12px;
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+}
   
