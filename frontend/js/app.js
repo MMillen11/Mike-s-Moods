@@ -390,14 +390,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.createElement('tbody');
         
         // Sort entries by date (newest first)
-        const sortedEntries = [...moodEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sortedEntries = [...moodEntries].sort((a, b) => {
+            // Ensure proper date comparison by parsing date strings manually
+            const partsA = a.date.split("-");
+            const partsB = b.date.split("-");
+            
+            if (partsA.length !== 3 || partsB.length !== 3) {
+                return 0; // If invalid date format, no change in order
+            }
+            
+            // Create dates using year, month, day
+            const dateA = new Date(
+                parseInt(partsA[0]),
+                parseInt(partsA[1]) - 1,
+                parseInt(partsA[2])
+            );
+            
+            const dateB = new Date(
+                parseInt(partsB[0]),
+                parseInt(partsB[1]) - 1,
+                parseInt(partsB[2])
+            );
+            
+            return dateB - dateA; // Descending order (newest first)
+        });
         
         sortedEntries.forEach(entry => {
             const row = document.createElement('tr');
             
             // Format date
             const date = new Date(entry.date);
-            const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+            // Fix timezone issue - ensure the date from the string is interpreted correctly
+            const dateParts = entry.date.split("-");
+            const year = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) - 1;  // JS months are 0-indexed
+            const day = parseInt(dateParts[2]);
+            const localDate = new Date(year, month, day);
+            const formattedDate = `${localDate.getMonth() + 1}/${localDate.getDate()}/${localDate.getFullYear()}`;
             
             // Add cells for each property
             const cells = [
@@ -478,15 +507,41 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Prepare data for the chart
         const sortedEntries = [...moodEntries].sort((a, b) => {
-            // Ensure proper date comparison by converting strings to Date objects
-            return new Date(a.date) - new Date(b.date);
+            // Ensure proper date comparison by parsing the date strings manually
+            const partsA = a.date.split("-");
+            const partsB = b.date.split("-");
+            
+            if (partsA.length !== 3 || partsB.length !== 3) {
+                return 0; // If invalid date format, no change in order
+            }
+            
+            // Create dates using year, month, day
+            const dateA = new Date(
+                parseInt(partsA[0]),
+                parseInt(partsA[1]) - 1,
+                parseInt(partsA[2])
+            );
+            
+            const dateB = new Date(
+                parseInt(partsB[0]),
+                parseInt(partsB[1]) - 1,
+                parseInt(partsB[2])
+            );
+            
+            return dateA - dateB;
         });
         
         // Check if we have an entry for today
         const today = new Date();
         const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
         const hasEntryForToday = moodEntries.some(entry => {
-            const entryDate = new Date(entry.date);
+            // Fix timezone issue by manually creating the date from parts
+            const dateParts = entry.date.split("-");
+            if (dateParts.length !== 3) return false;
+            const year = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) - 1;  // JS months are 0-indexed
+            const day = parseInt(dateParts[2]);
+            const entryDate = new Date(year, month, day);
             const entryFormatted = `${entryDate.getMonth() + 1}/${entryDate.getDate()}/${entryDate.getFullYear()}`;
             return entryFormatted === todayFormatted;
         });
@@ -501,7 +556,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         limitedEntries.forEach(entry => {
             // Ensure we're working with a proper Date object
-            const entryDate = new Date(entry.date);
+            // Fix timezone issue by manually creating the date from parts
+            const dateParts = entry.date.split("-");
+            const year = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) - 1;  // JS months are 0-indexed
+            const day = parseInt(dateParts[2]);
+            const entryDate = new Date(year, month, day);
             const formattedDate = `${entryDate.getMonth() + 1}/${entryDate.getDate()}/${entryDate.getFullYear()}`;
             
             if (!dateGroups[formattedDate]) {
@@ -1098,6 +1158,7 @@ document.head.insertAdjacentHTML('beforeend', `
 
 .data-table th {
     background-color: #f5f7fa;
+    color: black;
     font-weight: 600;
 }
 

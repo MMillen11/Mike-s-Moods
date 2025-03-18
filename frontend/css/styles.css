@@ -380,7 +380,7 @@ h3 {
 
 .data-table th {
     background-color: var(--primary-color);
-    color: white;
+    color: black;
     font-weight: 600;
 }
 
