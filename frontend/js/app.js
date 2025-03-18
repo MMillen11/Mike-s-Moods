@@ -581,6 +581,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render a table with all mood entries
     function renderAllData() {
         console.log('Starting renderAllData function');
+        
+        // Create a container for the table and controls
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'all-data-container';
+        
+        // Add Clear All Data button
+        const clearAllButton = document.createElement('button');
+        clearAllButton.textContent = 'Clear All Data';
+        clearAllButton.className = 'btn-clear-all';
+        clearAllButton.addEventListener('click', clearAllData);
+        
+        // Add button container with proper styling
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'clear-data-button-container';
+        buttonContainer.appendChild(clearAllButton);
+        tableContainer.appendChild(buttonContainer);
+        
+        // Create the table
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'data-table-wrapper';
+        tableContainer.appendChild(tableWrapper);
+        
         const table = document.createElement('table');
         table.className = 'data-table';
         
@@ -593,9 +615,12 @@ document.addEventListener('DOMContentLoaded', () => {
             'Job', 'Social', 'Alcohol', 'Sunlight', 'Weather', 'Actions'
         ];
         
-        headers.forEach(headerText => {
+        headers.forEach((headerText, index) => {
             const th = document.createElement('th');
             th.textContent = headerText;
+            if (index === 0) {
+                th.className = 'sticky-column';
+            }
             headerRow.appendChild(th);
         });
         
@@ -659,9 +684,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 entry.weather.charAt(0).toUpperCase() + entry.weather.slice(1) // Capitalize weather
             ];
             
-            cells.forEach(cellText => {
+            cells.forEach((cellText, index) => {
                 const td = document.createElement('td');
                 td.textContent = cellText;
+                if (index === 0) {
+                    td.className = 'sticky-column';
+                }
                 row.appendChild(td);
             });
             
@@ -678,7 +706,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         table.appendChild(tbody);
-        chartsContainer.appendChild(table);
+        tableWrapper.appendChild(table);
+        chartsContainer.appendChild(tableContainer);
+        
+        // Add CSS for the sticky column if it doesn't exist
+        if (!document.getElementById('sticky-column-styles')) {
+            const styleTag = document.createElement('style');
+            styleTag.id = 'sticky-column-styles';
+            styleTag.textContent = `
+                .all-data-container {
+                    margin-bottom: 30px;
+                }
+                
+                .clear-data-button-container {
+                    margin-bottom: 15px;
+                    text-align: right;
+                }
+                
+                .btn-clear-all {
+                    background-color: #dc3545;
+                    color: white;
+                    border: none;
+                    padding: 8px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 600;
+                }
+                
+                .btn-clear-all:hover {
+                    background-color: #bd2130;
+                }
+                
+                .data-table-wrapper {
+                    overflow-x: auto;
+                    position: relative;
+                }
+                
+                .sticky-column {
+                    position: sticky;
+                    left: 0;
+                    background-color: inherit;
+                    z-index: 1;
+                    box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+                }
+                
+                .data-table tr:nth-child(even) .sticky-column {
+                    background-color: #f9f9f9;
+                }
+                
+                .data-table tr:nth-child(odd) .sticky-column {
+                    background-color: white;
+                }
+                
+                .data-table thead .sticky-column {
+                    background-color: #f5f7fa;
+                    z-index: 2;
+                }
+            `;
+            document.head.appendChild(styleTag);
+        }
     }
     
     // Function to delete an entry
