@@ -44,6 +44,13 @@ header {
     position: relative;
 }
 
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 0;
+}
+
 header h1 {
     margin-bottom: 10px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -54,6 +61,10 @@ header h1 {
     font-size: 56px;
     letter-spacing: 1px;
     line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
 }
 
 .colorful-title span {
@@ -63,6 +74,7 @@ header h1 {
 .title-line {
     display: block;
     margin-bottom: 10px;
+    white-space: nowrap;
 }
 
 /* First line (Mike's) in green */
@@ -73,6 +85,26 @@ header h1 {
 /* Second line (Moods) in gold */
 .title-line:last-child span {
     color: #ffd700; /* Gold */
+}
+
+/* Header Icons */
+.header-icon {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    margin: 0 20px;
+    flex: 0 0 auto;
+    max-width: 120px;
+}
+
+.beaker-icon {
+    height: 85px;
+    margin-top: 5px;
+}
+
+.ruler-icon {
+    height: 90px;
+    transform: rotate(-10deg);
 }
 
 /* Form Styles */
@@ -505,6 +537,18 @@ footer {
         padding: 10px;
     }
     
+    .header-container {
+        flex-wrap: wrap;
+    }
+    
+    .header-icon {
+        height: 80px;
+    }
+    
+    .colorful-title {
+        font-size: 48px;
+    }
+    
     #mood-entry-form, #data-visualization {
         padding: 20px;
     }
@@ -599,100 +643,5 @@ footer {
     }
 }
 
-/* Deep Dive Analysis Styles */
-.deep-dive-button {
-    background-color: #4a6fa5;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px auto;
-    transition: background-color 0.3s;
-}
-
-.deep-dive-button:hover {
-    background-color: #3a5a8c;
-}
-
-.deep-dive-button:disabled {
-    background-color: #8ca5c2;
-    cursor: not-allowed;
-}
-
-.insights-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.insights-content {
-    background-color: white;
-    border-radius: 8px;
-    padding: 30px;
-    width: 80%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.insights-content h2 {
-    color: #4a6fa5;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.insights-text {
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.insights-text h3 {
-    color: #4a6fa5;
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-
-.insights-text ul {
-    margin-left: 20px;
-    margin-bottom: 15px;
-}
-
-.btn-close {
-    background-color: #f0f0f0;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: block;
-    margin: 0 auto;
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-    border: 3px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+/* Weather Correlation Matrix Styles */
   
