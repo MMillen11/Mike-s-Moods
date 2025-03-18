@@ -540,11 +540,14 @@ footer {
     .header-container {
         flex-wrap: nowrap;
         justify-content: space-between;
+        width: 100%;
+        padding: 5px 0;
     }
     
     .header-icon {
         height: 60px;
-        margin: 0 10px;
+        margin: 0 5px;
+        flex: 0 0 auto;
     }
     
     .beaker-icon {
@@ -553,18 +556,20 @@ footer {
     }
     
     .colorful-title {
-        font-size: 40px;
+        font-size: 36px;
         order: 2;
-        margin: 0 5px;
+        margin: 0;
+        flex: 1 1 auto;
     }
     
     .title-line {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
     }
     
     .ruler-icon {
         height: 65px;
         order: 3;
+        transform: rotate(-10deg);
     }
     
     #mood-entry-form, #data-visualization {
@@ -632,24 +637,48 @@ footer {
 /* Extra small screens */
 @media (max-width: 380px) {
     .header-container {
-        padding: 10px 0;
+        padding: 5px 0;
     }
     
     .header-icon {
-        height: 50px;
-        margin: 0 5px;
+        height: 45px;
+        margin: 0 3px;
     }
     
     .beaker-icon {
-        height: 55px;
+        height: 50px;
     }
     
     .ruler-icon {
-        height: 55px;
+        height: 50px;
     }
     
     .colorful-title {
-        font-size: 32px;
+        font-size: 28px;
+    }
+    
+    .title-line {
+        margin-bottom: 2px;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 320px) {
+    .header-icon {
+        height: 40px;
+        margin: 0 2px;
+    }
+    
+    .beaker-icon {
+        height: 45px;
+    }
+    
+    .ruler-icon {
+        height: 45px;
+    }
+    
+    .colorful-title {
+        font-size: 24px;
     }
 }
 
