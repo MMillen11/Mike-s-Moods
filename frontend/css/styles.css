@@ -14,8 +14,8 @@
     /* Visualization Button Colors */
     --viz-btn1-color: #e53935; /* Red */
     --viz-btn2-color: #ff8f00; /* Orange */
-    --viz-btn3-color: #455a64; /* Dark Gray */
-    --viz-btn4-color: #5e35b1; /* Deep Purple */
+    --viz-btn3-color: #00897b; /* Teal */
+    --viz-btn4-color: #455a64; /* Dark Gray */
 }
 
 /* Beaker Bubbles Animation */
@@ -497,12 +497,12 @@ h3 {
 
 #view-correlations {
     background-color: var(--viz-btn3-color);
-    background-image: linear-gradient(135deg, var(--viz-btn3-color), #607d8b);
+    background-image: linear-gradient(135deg, var(--viz-btn3-color), #00bfa5);
 }
 
 #view-correlation-matrix {
     background-color: var(--viz-btn4-color);
-    background-image: linear-gradient(135deg, var(--viz-btn4-color), #7c4dff);
+    background-image: linear-gradient(135deg, var(--viz-btn4-color), #607d8b);
 }
 
 /* Active state for buttons */
@@ -522,11 +522,11 @@ h3 {
 }
 
 #view-correlations:hover {
-    background-image: linear-gradient(135deg, #37474f, #607d8b);
+    background-image: linear-gradient(135deg, #00796b, #00bfa5);
 }
 
 #view-correlation-matrix:hover {
-    background-image: linear-gradient(135deg, #4527a0, #7c4dff);
+    background-image: linear-gradient(135deg, #37474f, #607d8b);
 }
 
 #charts-container {
@@ -754,17 +754,20 @@ footer {
     
     .visualization-controls {
         flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 5px;
+        overflow-x: auto;
+        padding-bottom: 10px;
     }
     
     .visualization-controls .btn {
         width: auto;
-        max-width: 45%;
-        padding: 8px 12px;
-        font-size: 14px;
-        margin-bottom: 8px;
+        flex: 0 0 auto;
+        font-size: 13px;
+        padding: 8px 10px;
+        white-space: nowrap;
+        margin-bottom: 0;
     }
     
     .correlation-charts {
@@ -808,7 +811,8 @@ footer {
     
     /* Sticky column improvements for mobile */
     .sticky-column {
-        left: 0;
+        position: sticky;
+        background-color: inherit;
         box-shadow: 2px 0 5px -2px rgba(0,0,0,0.2);
     }
     
@@ -817,8 +821,6 @@ footer {
     .data-table td:nth-child(1),
     .data-table th:nth-child(2),
     .data-table td:nth-child(2),
-    .data-table th:nth-child(3),
-    .data-table td:nth-child(3),
     .data-table th:nth-child(12),
     .data-table td:nth-child(12) {
         position: sticky;
@@ -833,28 +835,35 @@ footer {
 
     .data-table th:nth-child(2),
     .data-table td:nth-child(2) {
-        left: 80px;
+        left: 95px;
         z-index: 2;
     }
     
-    .data-table th:nth-child(3),
-    .data-table td:nth-child(3) {
-        left: 160px;
-        z-index: 1;
+    /* Headers need background color matching the table header */
+    .data-table th.sticky-column {
+        background-color: var(--primary-color);
+        z-index: 5;
+    }
+    
+    /* Ensure rows have proper background color */
+    .data-table tr td.sticky-column {
+        background-color: rgba(255, 255, 255, 0.9);
     }
     
     /* Even rows background for sticky columns */
-    .data-table tr:nth-child(even) td:nth-child(1),
-    .data-table tr:nth-child(even) td:nth-child(2),
-    .data-table tr:nth-child(even) td:nth-child(3) {
+    .data-table tr:nth-child(even) td.sticky-column {
         background-color: rgba(249, 249, 249, 0.8);
     }
     
     /* Hover effect for sticky columns */
-    .data-table tr:hover td:nth-child(1),
-    .data-table tr:hover td:nth-child(2),
-    .data-table tr:hover td:nth-child(3) {
+    .data-table tr:hover td.sticky-column {
         background-color: rgba(241, 241, 241, 0.9);
+    }
+    
+    /* Remove unused column settings */
+    .data-table th:nth-child(3),
+    .data-table td:nth-child(3) {
+        position: static;
     }
 }
 
