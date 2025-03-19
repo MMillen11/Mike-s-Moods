@@ -10,6 +10,12 @@
     --danger-color: #dc3545;
     --border-radius: 5px;
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    
+    /* Visualization Button Colors */
+    --viz-btn1-color: #e53935; /* Red */
+    --viz-btn2-color: #ff8f00; /* Orange */
+    --viz-btn3-color: #00897b; /* Teal */
+    --viz-btn4-color: #5e35b1; /* Deep Purple */
 }
 
 /* Beaker Bubbles Animation */
@@ -197,7 +203,7 @@ header h1 {
 
 /* First line (Mike's) in green */
 .title-line:first-child span {
-    color: #ff6347; /* Changed from #4a90e2 (blue) to #4caf50 (green) */
+    color: #4caf50; /* Changed from #4a90e2 (blue) to #4caf50 (green) */
 }
 
 /* Second line (Moods) in gold */
@@ -450,25 +456,77 @@ h3 {
     backdrop-filter: blur(5px);
 }
 
+/* Visualization Controls Styling */
 .visualization-controls {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
+    justify-content: center;
 }
 
+/* Basic Button Styling */
 .btn {
-    background-color: var(--light-color);
-    border: 1px solid #ddd;
-    padding: 8px 15px;
+    padding: 10px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--box-shadow);
 }
 
 .btn:hover {
-    background-color: var(--primary-color);
-    color: white;
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific Visualization Button Styling */
+#view-all-data {
+    background-color: var(--viz-btn1-color);
+    background-image: linear-gradient(135deg, var(--viz-btn1-color), #ff5252);
+}
+
+#view-mood-trends {
+    background-color: var(--viz-btn2-color);
+    background-image: linear-gradient(135deg, var(--viz-btn2-color), #ffab00);
+}
+
+#view-correlations {
+    background-color: var(--viz-btn3-color);
+    background-image: linear-gradient(135deg, var(--viz-btn3-color), #00bfa5);
+}
+
+#view-correlation-matrix {
+    background-color: var(--viz-btn4-color);
+    background-image: linear-gradient(135deg, var(--viz-btn4-color), #7c4dff);
+}
+
+/* Active state for buttons */
+.btn.active {
+    position: relative;
+    outline: 2px solid white;
+    outline-offset: -4px;
+}
+
+/* Button hover effects */
+#view-all-data:hover {
+    background-image: linear-gradient(135deg, #c62828, #ff5252);
+}
+
+#view-mood-trends:hover {
+    background-image: linear-gradient(135deg, #ef6c00, #ffab00);
+}
+
+#view-correlations:hover {
+    background-image: linear-gradient(135deg, #00796b, #00bfa5);
+}
+
+#view-correlation-matrix:hover {
+    background-image: linear-gradient(135deg, #4527a0, #7c4dff);
 }
 
 #charts-container {

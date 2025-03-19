@@ -552,6 +552,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear previous visualizations
         chartsContainer.innerHTML = '';
         
+        // Remove active class from all buttons
+        document.querySelectorAll('.visualization-controls .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to the selected button
+        let activeButtonId;
+        switch(type) {
+            case 'all-data':
+                activeButtonId = 'view-all-data';
+                break;
+            case 'mood-trends':
+                activeButtonId = 'view-mood-trends';
+                break;
+            case 'correlations':
+                activeButtonId = 'view-correlations';
+                break;
+            case 'correlation-matrix':
+                activeButtonId = 'view-correlation-matrix';
+                break;
+        }
+        
+        if (activeButtonId) {
+            document.getElementById(activeButtonId).classList.add('active');
+        }
+        
         console.log(`Rendering visualization: ${type}`);
         
         // Show the appropriate visualization
