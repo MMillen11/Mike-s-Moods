@@ -197,7 +197,7 @@ header h1 {
 
 /* First line (Mike's) in green */
 .title-line:first-child span {
-    color: #4caf50; /* Changed from #4a90e2 (blue) to #4caf50 (green) */
+    color: #ff6347; /* Changed from #4a90e2 (blue) to #4caf50 (green) */
 }
 
 /* Second line (Moods) in gold */
