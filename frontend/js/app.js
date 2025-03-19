@@ -617,7 +617,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Parse entries and sort by date (most recent first)
         const moodEntries = JSON.parse(storedMoodEntries);
+        moodEntries.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateB - dateA; // Sort in descending order (newest first)
+        });
         
         // Create clear all data button
         const clearDataButtonContainer = document.createElement('div');
