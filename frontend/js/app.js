@@ -335,11 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: "Effects of Alcohol on the Brain, Body & Health | Andrew Huberman",
                 videoId: "DkS1pkKpILY",
                 description: "Dr. Huberman explains alcohol's effects on your body and brain"
-            },
-            {
-                title: "How Alcohol Hijacks Your Dopamine System | Andrew Huberman",
-                videoId: "EEOM8hLMdHg",
-                description: "Dr. Huberman explains how alcohol affects your brain's reward system"
             }
         ];
         
