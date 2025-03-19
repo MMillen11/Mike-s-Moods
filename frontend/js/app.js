@@ -607,28 +607,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render a table with all mood entries
     function renderAllData() {
         console.log('Starting renderAllData function');
+        const chartsContainer = document.getElementById('charts-container');
         
-        // Create a container for the table and controls
-        const tableContainer = document.createElement('div');
-        tableContainer.className = 'all-data-container';
+        // Get mood entries from local storage
+        const storedMoodEntries = localStorage.getItem('moodEntries');
         
-        // Add Clear All Data button
+        if (!storedMoodEntries || JSON.parse(storedMoodEntries).length === 0) {
+            chartsContainer.innerHTML = '<p>No mood entries found. Add some entries to see visualizations.</p>';
+            return;
+        }
+        
+        const moodEntries = JSON.parse(storedMoodEntries);
+        
+        // Create clear all data button
+        const clearDataButtonContainer = document.createElement('div');
+        clearDataButtonContainer.className = 'clear-data-button-container';
+        
         const clearAllButton = document.createElement('button');
         clearAllButton.textContent = 'Clear All Data';
         clearAllButton.className = 'btn-clear-all';
         clearAllButton.addEventListener('click', clearAllData);
         
-        // Add button container with proper styling
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'clear-data-button-container';
-        buttonContainer.appendChild(clearAllButton);
-        tableContainer.appendChild(buttonContainer);
+        clearDataButtonContainer.appendChild(clearAllButton);
+        chartsContainer.appendChild(clearDataButtonContainer);
         
-        // Create the table
+        // Create table wrapper for mobile scrolling
         const tableWrapper = document.createElement('div');
         tableWrapper.className = 'data-table-wrapper';
-        tableContainer.appendChild(tableWrapper);
         
+        // Create the table
         const table = document.createElement('table');
         table.className = 'data-table';
         
@@ -636,17 +643,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = [
-            'Date', 'Mood', 'Exercise', 'Sleep', 'Diet', 'Portfolio', 
-            'Job', 'Social', 'Alcohol', 'Sunlight', 'Weather', 'Actions'
+        // Define the columns
+        const columns = [
+            { key: 'date', label: 'Date' },
+            { key: 'mood', label: 'Mood' },
+            { key: 'exercise', label: 'Exercise' },
+            { key: 'sleep', label: 'Sleep' },
+            { key: 'diet', label: 'Diet' },
+            { key: 'portfolio', label: 'Portfolio' },
+            { key: 'job', label: 'Work' },
+            { key: 'social', label: 'Social' },
+            { key: 'alcohol', label: 'Alcohol' },
+            { key: 'sunlight', label: 'Sunlight' },
+            { key: 'weather', label: 'Weather' },
+            { key: 'actions', label: 'Actions' }
         ];
         
-        headers.forEach((headerText, index) => {
+        // Add headers
+        columns.forEach((column, index) => {
             const th = document.createElement('th');
-            th.textContent = headerText;
-            if (index === 0) {
-                th.className = 'sticky-column';
+            th.textContent = column.label;
+            
+            // Add sticky-column class to Date and Mood columns
+            if (index === 0 || index === 1) {
+                th.classList.add('sticky-column');
             }
+            
             headerRow.appendChild(th);
         });
         
@@ -656,141 +678,43 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create table body
         const tbody = document.createElement('tbody');
         
-        // Sort entries by date (newest first)
-        const sortedEntries = [...moodEntries].sort((a, b) => {
-            // Ensure proper date comparison by parsing date strings manually
-            const partsA = a.date.split("-");
-            const partsB = b.date.split("-");
-            
-            if (partsA.length !== 3 || partsB.length !== 3) {
-                return 0; // If invalid date format, no change in order
-            }
-            
-            // Create dates using year, month, day
-            const dateA = new Date(
-                parseInt(partsA[0]),
-                parseInt(partsA[1]) - 1,
-                parseInt(partsA[2])
-            );
-            
-            const dateB = new Date(
-                parseInt(partsB[0]),
-                parseInt(partsB[1]) - 1,
-                parseInt(partsB[2])
-            );
-            
-            return dateB - dateA; // Descending order (newest first)
-        });
-        
-        sortedEntries.forEach(entry => {
+        // Add rows for each entry
+        moodEntries.forEach(entry => {
             const row = document.createElement('tr');
             
-            // Format date
-            const date = new Date(entry.date);
-            // Fix timezone issue - ensure the date from the string is interpreted correctly
-            const dateParts = entry.date.split("-");
-            const year = parseInt(dateParts[0]);
-            const month = parseInt(dateParts[1]) - 1;  // JS months are 0-indexed
-            const day = parseInt(dateParts[2]);
-            const localDate = new Date(year, month, day);
-            const formattedDate = `${localDate.getMonth() + 1}/${localDate.getDate()}/${localDate.getFullYear()}`;
-            
-            // Add cells for each property
-            const cells = [
-                formattedDate,
-                entry.mood, // Numeric mood value
-                entry.exercise,
-                entry.sleep,
-                entry.diet,
-                entry.portfolio,
-                entry.job,
-                entry.social,
-                entry.alcohol,
-                entry.sunlight,
-                entry.weather.charAt(0).toUpperCase() + entry.weather.slice(1) // Capitalize weather
-            ];
-            
-            cells.forEach((cellText, index) => {
+            // Add cells for each column
+            columns.forEach((column, index) => {
                 const td = document.createElement('td');
-                td.textContent = cellText;
-                if (index === 0) {
-                    td.className = 'sticky-column';
+                
+                // Add sticky-column class to Date and Mood columns
+                if (index === 0 || index === 1) {
+                    td.classList.add('sticky-column');
                 }
+                
+                if (column.key === 'actions') {
+                    // Add delete button
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.addEventListener('click', () => deleteEntry(entry.id));
+                    td.appendChild(deleteBtn);
+                } else if (column.key === 'date') {
+                    // Format date nicely
+                    const date = new Date(entry[column.key]);
+                    td.textContent = date.toLocaleDateString();
+                } else {
+                    td.textContent = entry[column.key];
+                }
+                
                 row.appendChild(td);
             });
-            
-            // Add delete button
-            const actionsTd = document.createElement('td');
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.className = 'btn-delete';
-            deleteBtn.addEventListener('click', () => deleteEntry(entry.id));
-            actionsTd.appendChild(deleteBtn);
-            row.appendChild(actionsTd);
             
             tbody.appendChild(row);
         });
         
         table.appendChild(tbody);
         tableWrapper.appendChild(table);
-        chartsContainer.appendChild(tableContainer);
-        
-        // Add CSS for the sticky column if it doesn't exist
-        if (!document.getElementById('sticky-column-styles')) {
-            const styleTag = document.createElement('style');
-            styleTag.id = 'sticky-column-styles';
-            styleTag.textContent = `
-                .all-data-container {
-                    margin-bottom: 30px;
-                }
-                
-                .clear-data-button-container {
-                    margin-bottom: 15px;
-                    text-align: right;
-                }
-                
-                .btn-clear-all {
-                    background-color: #dc3545;
-                    color: white;
-                    border: none;
-                    padding: 8px 15px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-weight: 600;
-                }
-                
-                .btn-clear-all:hover {
-                    background-color: #bd2130;
-                }
-                
-                .data-table-wrapper {
-                    overflow-x: auto;
-                    position: relative;
-                }
-                
-                .sticky-column {
-                    position: sticky;
-                    left: 0;
-                    background-color: inherit;
-                    z-index: 1;
-                    box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
-                }
-                
-                .data-table tr:nth-child(even) .sticky-column {
-                    background-color: #f9f9f9;
-                }
-                
-                .data-table tr:nth-child(odd) .sticky-column {
-                    background-color: white;
-                }
-                
-                .data-table thead .sticky-column {
-                    background-color: #f5f7fa;
-                    z-index: 2;
-                }
-            `;
-            document.head.appendChild(styleTag);
-        }
+        chartsContainer.appendChild(tableWrapper);
     }
     
     // Function to delete an entry
