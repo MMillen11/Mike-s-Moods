@@ -873,15 +873,81 @@ document.addEventListener('DOMContentLoaded', () => {
         chartContainer.className = 'chart-container';
         chartContainer.innerHTML = `
             <h3>Comprehensive Metrics Over Time</h3>
-            <div style="position: relative; height: 600px;">
+            <div style="position: relative; height: 500px;" class="comprehensive-chart-container">
                 <canvas id="comprehensive-chart"></canvas>
             </div>
-            <div class="chart-legend" style="margin-top: 20px; text-align: center;">
-                <div style="margin-bottom: 10px;"><strong>Toggle Variables:</strong></div>
-                <div id="custom-legend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+            <div class="chart-legend" style="margin-top: 15px; text-align: center;">
+                <div style="margin-bottom: 8px;"><strong>Toggle Variables:</strong></div>
+                <div id="custom-legend" class="custom-legend-container"></div>
             </div>
         `;
         chartsContainer.appendChild(chartContainer);
+        
+        // Add responsive styles for the chart if they don't exist
+        if (!document.getElementById('comprehensive-chart-styles')) {
+            const styleTag = document.createElement('style');
+            styleTag.id = 'comprehensive-chart-styles';
+            styleTag.textContent = `
+                .comprehensive-chart-container {
+                    margin: 0 auto;
+                    max-width: 100%;
+                }
+                
+                .custom-legend-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-bottom: 15px;
+                }
+                
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    padding: 5px 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    background-color: white;
+                    transition: background-color 0.2s;
+                }
+                
+                .legend-item.active {
+                    background-color: #f5f5f5;
+                }
+                
+                .legend-color {
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    margin-right: 5px;
+                    border-radius: 2px;
+                }
+                
+                @media (max-width: 768px) {
+                    .comprehensive-chart-container {
+                        height: 400px !important;
+                    }
+                    
+                    .custom-legend-container {
+                        gap: 5px;
+                    }
+                    
+                    .legend-item {
+                        padding: 4px 8px;
+                        font-size: 12px;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .comprehensive-chart-container {
+                        height: 350px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(styleTag);
+        }
         
         // Prepare data for the chart
         const sortedEntries = [...moodEntries].sort((a, b) => {
@@ -926,8 +992,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('Has entry for today:', hasEntryForToday, 'Today:', todayFormatted);
         
-        // Limit to last 90 days if needed
-        const limitedEntries = sortedEntries.length > 90 ? sortedEntries.slice(-90) : sortedEntries;
+        // Limit to last 30 days if on mobile, otherwise 90 days
+        const isMobile = window.innerWidth <= 768;
+        const daysToShow = isMobile ? 30 : 90;
+        const limitedEntries = sortedEntries.length > daysToShow ? sortedEntries.slice(-daysToShow) : sortedEntries;
         
         // Group entries by date
         const dateGroups = {};
@@ -1015,9 +1083,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Metrics Over Time (90-Day View)',
+                        text: isMobile ? `Metrics Over Time (${daysToShow}-Day View)` : 'Metrics Over Time (90-Day View)',
                         font: {
-                            size: 16
+                            size: isMobile ? 14 : 16
                         }
                     },
                     tooltip: {
@@ -1042,7 +1110,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         ticks: {
                             maxRotation: 45,
-                            minRotation: 45
+                            minRotation: 45,
+                            font: {
+                                size: isMobile ? 10 : 12
+                            },
+                            // Show fewer ticks on mobile
+                            callback: function(value, index, values) {
+                                if (isMobile) {
+                                    // Only show every nth label on mobile
+                                    const skipFactor = Math.ceil(dates.length / 6); // Show about 6 labels max
+                                    return index % skipFactor === 0 ? this.getLabelForValue(value) : '';
+                                }
+                                return this.getLabelForValue(value);
+                            }
                         }
                     },
                     y: {
@@ -1054,7 +1134,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         min: 0,
                         max: 11,
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            font: {
+                                size: isMobile ? 10 : 12
+                            }
                         }
                     }
                 },
@@ -1071,20 +1154,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         variables.forEach((variable, index) => {
             const legendItem = document.createElement('div');
-            legendItem.style.display = 'flex';
-            legendItem.style.alignItems = 'center';
-            legendItem.style.cursor = 'pointer';
-            legendItem.style.padding = '5px 10px';
-            legendItem.style.border = '1px solid #ddd';
-            legendItem.style.borderRadius = '5px';
-            legendItem.style.backgroundColor = variable.visible ? '#f5f5f5' : 'white';
+            legendItem.className = `legend-item ${variable.visible ? 'active' : ''}`;
             
             const colorBox = document.createElement('span');
-            colorBox.style.display = 'inline-block';
-            colorBox.style.width = '12px';
-            colorBox.style.height = '12px';
+            colorBox.className = 'legend-color';
             colorBox.style.backgroundColor = variable.color;
-            colorBox.style.marginRight = '5px';
             
             const labelText = document.createElement('span');
             labelText.textContent = variable.name;
@@ -1099,10 +1173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (isDataShown) {
                     chart.hide(datasetIndex);
-                    legendItem.style.backgroundColor = 'white';
+                    legendItem.classList.remove('active');
                 } else {
                     chart.show(datasetIndex);
-                    legendItem.style.backgroundColor = '#f5f5f5';
+                    legendItem.classList.add('active');
                 }
             });
             
@@ -1270,7 +1344,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="chart-description">Relationship strength between different metrics (higher values indicate stronger correlations)</p>
             <div class="correlation-matrix-container">
                 <div class="correlation-matrix-chart" id="correlation-matrix-table"></div>
-                <p class="correlation-instructions">Scroll horizontally if needed to view the full matrix</p>
             </div>
         `;
         chartsContainer.appendChild(matrixContainer);
@@ -1336,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cornerCell = document.createElement('th');
         cornerCell.style.backgroundColor = '#f5f7fa';
         cornerCell.style.border = '1px solid #ddd';
-        cornerCell.style.padding = '10px';
+        cornerCell.style.padding = window.innerWidth <= 768 ? '6px' : '10px';
         headerRow.appendChild(cornerCell);
         
         // Add column headers
@@ -1345,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             th.textContent = name;
             th.style.backgroundColor = '#f5f7fa';
             th.style.border = '1px solid #ddd';
-            th.style.padding = '10px';
+            th.style.padding = window.innerWidth <= 768 ? '6px' : '10px';
             headerRow.appendChild(th);
         });
         
@@ -1364,7 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
             th.textContent = variableNames[i];
             th.style.backgroundColor = '#f5f7fa';
             th.style.border = '1px solid #ddd';
-            th.style.padding = '10px';
+            th.style.padding = window.innerWidth <= 768 ? '6px' : '10px';
             th.style.textAlign = 'left';
             row.appendChild(th);
             
@@ -1373,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const td = document.createElement('td');
                 td.textContent = correlationMatrix[i][j].toFixed(2);
                 td.style.border = '1px solid #ddd';
-                td.style.padding = '10px';
+                td.style.padding = window.innerWidth <= 768 ? '6px' : '10px';
                 
                 // Color based on correlation value
                 let cellColor;
@@ -1415,6 +1488,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         table.appendChild(tbody);
         tableContainer.appendChild(table);
+        
+        // Add scroll instruction
+        const scrollInstruction = document.createElement('p');
+        scrollInstruction.className = 'correlation-instructions';
+        scrollInstruction.textContent = "← Scroll horizontally if needed to view full matrix →";
+        matrixContainer.querySelector('.correlation-matrix-container').appendChild(scrollInstruction);
         
         // Add a legend explaining correlation values
         const legendContainer = document.createElement('div');
@@ -1459,36 +1538,38 @@ document.addEventListener('DOMContentLoaded', () => {
         matrixContainer.querySelector('.correlation-matrix-container').appendChild(legendContainer);
         matrixContainer.querySelector('.correlation-matrix-container').appendChild(explanationText);
         
-        // Add info about strongest correlations
-        const strongestCorrelations = findStrongestCorrelations(correlationMatrix, variableNames);
-        if (strongestCorrelations.positive.length > 0 || strongestCorrelations.negative.length > 0) {
-            const insightsDiv = document.createElement('div');
-            insightsDiv.style.marginTop = '30px';
-            insightsDiv.style.padding = '15px';
-            insightsDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-            insightsDiv.style.borderRadius = '5px';
-            insightsDiv.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-            
-            let insightsHTML = '<h4 style="margin-top: 0;">Key Insights</h4>';
-            
-            if (strongestCorrelations.positive.length > 0) {
-                insightsHTML += '<p><strong>Strongest positive correlations:</strong></p><ul>';
-                strongestCorrelations.positive.forEach(corr => {
-                    insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
-                });
-                insightsHTML += '</ul>';
+        // Add info about strongest correlations if there's enough space (hide on mobile)
+        if (window.innerWidth > 768) {
+            const strongestCorrelations = findStrongestCorrelations(correlationMatrix, variableNames);
+            if (strongestCorrelations.positive.length > 0 || strongestCorrelations.negative.length > 0) {
+                const insightsDiv = document.createElement('div');
+                insightsDiv.style.marginTop = '20px';
+                insightsDiv.style.padding = '15px';
+                insightsDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                insightsDiv.style.borderRadius = '5px';
+                insightsDiv.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                
+                let insightsHTML = '<h4 style="margin-top: 0;">Key Insights</h4>';
+                
+                if (strongestCorrelations.positive.length > 0) {
+                    insightsHTML += '<p><strong>Strongest positive correlations:</strong></p><ul>';
+                    strongestCorrelations.positive.forEach(corr => {
+                        insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
+                    });
+                    insightsHTML += '</ul>';
+                }
+                
+                if (strongestCorrelations.negative.length > 0) {
+                    insightsHTML += '<p><strong>Strongest negative correlations:</strong></p><ul>';
+                    strongestCorrelations.negative.forEach(corr => {
+                        insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
+                    });
+                    insightsHTML += '</ul>';
+                }
+                
+                insightsDiv.innerHTML = insightsHTML;
+                matrixContainer.querySelector('.correlation-matrix-container').appendChild(insightsDiv);
             }
-            
-            if (strongestCorrelations.negative.length > 0) {
-                insightsHTML += '<p><strong>Strongest negative correlations:</strong></p><ul>';
-                strongestCorrelations.negative.forEach(corr => {
-                    insightsHTML += `<li>${corr.var1} ↔ ${corr.var2}: ${corr.value.toFixed(2)}</li>`;
-                });
-                insightsHTML += '</ul>';
-            }
-            
-            insightsDiv.innerHTML = insightsHTML;
-            matrixContainer.querySelector('.correlation-matrix-container').appendChild(insightsDiv);
         }
     }
     

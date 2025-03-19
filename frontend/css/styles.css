@@ -747,14 +747,13 @@ footer {
 
 .correlation-matrix-chart {
     min-width: 600px;
-    height: 600px;
     margin: 0 auto;
 }
 
 .correlation-matrix-legend {
     display: flex;
     justify-content: center;
-    margin: 15px 0;
+    margin: 15px 0 5px;
     flex-wrap: wrap;
 }
 
@@ -773,7 +772,7 @@ footer {
 
 .correlation-instructions {
     text-align: center;
-    margin: 15px 0;
+    margin: 5px 0 10px;
     font-style: italic;
     color: var(--secondary-color);
 }
@@ -788,12 +787,12 @@ footer {
     
     .correlation-matrix-chart {
         min-width: 500px;
-        height: 500px;
     }
     
     .correlation-matrix-legend {
         justify-content: flex-start;
         padding: 0 10px;
+        margin-top: 5px;
     }
     
     /* Add horizontal scroll hint */
@@ -801,7 +800,7 @@ footer {
         content: "← Scroll to view full matrix →";
         display: block;
         text-align: center;
-        padding: 10px;
+        padding: 5px 0;
         color: var(--secondary-color);
         font-size: 14px;
         font-style: italic;
@@ -811,11 +810,10 @@ footer {
 @media (max-width: 380px) {
     .correlation-matrix-chart {
         min-width: 450px;
-        height: 450px;
     }
     
     .legend-item {
-        margin: 0 5px 8px;
+        margin: 0 5px 5px;
         font-size: 12px;
     }
     
