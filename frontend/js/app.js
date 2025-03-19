@@ -664,8 +664,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const th = document.createElement('th');
             th.textContent = column.label;
             
-            // Add sticky-column class to Date and Mood columns
-            if (index === 0 || index === 1) {
+            // Add sticky-column class to Date column only
+            if (index === 0) {
                 th.classList.add('sticky-column');
             }
             
@@ -686,8 +686,8 @@ document.addEventListener('DOMContentLoaded', () => {
             columns.forEach((column, index) => {
                 const td = document.createElement('td');
                 
-                // Add sticky-column class to Date and Mood columns
-                if (index === 0 || index === 1) {
+                // Add sticky-column class to Date column only
+                if (index === 0) {
                     td.classList.add('sticky-column');
                 }
                 
