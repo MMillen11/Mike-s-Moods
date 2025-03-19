@@ -1038,4 +1038,36 @@ footer {
         margin-right: 4px;
     }
 }
+
+#weather {
+    background-color: #00897b;
+    color: white;
+    border: 1px solid #00796b;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px; /* Reduced width */
+}
+
+#weather:hover {
+    background-color: #00796b;
+}
+
+#weather option {
+    background-color: #00897b;
+    color: white;
+}
+
+/* Style for selected option */
+#weather option:checked {
+    background-color: white;
+    color: black;
+}
+
+/* Style for dropdown options when opened */
+#weather option {
+    background-color: white;
+    color: black;
+}
   
