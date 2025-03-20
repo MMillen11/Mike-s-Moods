@@ -206,12 +206,12 @@ header h1 {
 
 /* First line (Mike's) shifted left */
 .title-line:first-child {
-    padding-right: 55px;
+    padding-right: 40px;
 }
 
 /* Second line (Metrics) shifted right */
 .title-line:last-child {
-    padding-left: 55px;
+    padding-left: 40px;
 }
 
 /* First line (Mike's) in green */
