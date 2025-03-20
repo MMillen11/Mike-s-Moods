@@ -241,7 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dateParts.length === 3) {
                 // Create a date using year, month-1 (0-indexed), day
                 const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-                formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                // Use the original date value to avoid timezone issues
+                formattedDate = dateValue;
             }
         }
         
@@ -260,12 +261,22 @@ document.addEventListener('DOMContentLoaded', () => {
             weather: formData.get('weather')
         };
         
-        // Save entry to array and localStorage
-        moodEntries.push(entryData);
-        localStorage.setItem('moodEntries', JSON.stringify(moodEntries));
+        // Check if an entry already exists for this date
+        const existingEntryIndex = moodEntries.findIndex(entry => entry.date === formattedDate);
         
-        // Show success message
-        alert('Mood entry saved successfully!');
+        if (existingEntryIndex !== -1) {
+            // Replace the existing entry
+            moodEntries[existingEntryIndex] = entryData;
+            // Show message that entry was updated
+            alert('Entry for this date has been updated!');
+        } else {
+            // Add new entry
+            moodEntries.push(entryData);
+            alert('Mood entry saved successfully!');
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('moodEntries', JSON.stringify(moodEntries));
         
         // Reset form
         moodForm.reset();
@@ -701,8 +712,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     td.appendChild(deleteBtn);
                 } else if (column.key === 'date') {
                     // Format date nicely
-                    const date = new Date(entry[column.key]);
-                    td.textContent = date.toLocaleDateString();
+                    const dateParts = entry[column.key].split('-');
+                    const year = parseInt(dateParts[0]);
+                    const month = parseInt(dateParts[1]) - 1;  // JS months are 0-indexed
+                    const day = parseInt(dateParts[2]);
+                    const date = new Date(year, month, day);
+                    td.textContent = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
                 } else {
                     td.textContent = entry[column.key];
                 }
