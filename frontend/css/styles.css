@@ -204,6 +204,16 @@ header h1 {
     white-space: nowrap;
 }
 
+/* First line (Mike's) shifted left */
+.title-line:first-child {
+    padding-right: 75px;
+}
+
+/* Second line (Metrics) shifted right */
+.title-line:last-child {
+    padding-left: 75px;
+}
+
 /* First line (Mike's) in green */
 .title-line:first-child span {
     color: #4caf50; /* Changed from #4a90e2 (blue) to #4caf50 (green) */
