@@ -755,12 +755,12 @@ footer {
     }
     /* First line (Mike's) shifted left */
 .title-line:first-child {
-    padding-right: 75px;
+    padding-right: 55px;
 }
 
 /* Second line (Metrics) shifted right */
 .title-line:last-child {
-    padding-left: 75px;
+    padding-left: 55px;
 }
     
     .title-line {
