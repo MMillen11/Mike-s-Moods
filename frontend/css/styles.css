@@ -753,15 +753,7 @@ footer {
         margin: 0;
         flex: 1 1 auto;
     }
-    /* First line (Mike's) shifted left */
-.title-line:first-child {
-    padding-right: 50px;
-}
-
-/* Second line (Metrics) shifted right */
-.title-line:last-child {
-    padding-left: 50px;
-}
+ 
     
     .title-line {
         margin-bottom: 3px;
