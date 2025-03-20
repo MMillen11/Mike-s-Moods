@@ -651,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'exercise', label: 'Exercise' },
             { key: 'sleep', label: 'Sleep' },
             { key: 'diet', label: 'Diet' },
-            { key: 'portfolio', label: 'Portfolio' },
+            { key: 'portfolio', label: 'Steps' },
             { key: 'job', label: 'Work' },
             { key: 'social', label: 'Social' },
             { key: 'alcohol', label: 'Alcohol' },
@@ -989,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'exercise', name: 'Exercise', color: '#4caf50', visible: false }, // Green
             { key: 'sleep', name: 'Sleep', color: '#9c27b0', visible: false },      // Purple
             { key: 'diet', name: 'Diet', color: '#8bc34a', visible: false },        // Light Green
-            { key: 'portfolio', name: 'Portfolio', color: '#2196f3', visible: false }, // Blue
+            { key: 'portfolio', name: 'Steps', color: '#2196f3', visible: false },    // Blue
             { key: 'job', name: 'Job', color: '#607d8b', visible: false },          // Blue Gray
             { key: 'social', name: 'Social', color: '#e91e63', visible: false },    // Pink
             { key: 'alcohol', name: 'Alcohol', color: '#795548', visible: false },  // Brown
@@ -1305,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'exercise', name: 'Exercise' },
             { key: 'sleep', name: 'Sleep' },
             { key: 'diet', name: 'Diet' },
-            { key: 'portfolio', name: 'Portfolio' },
+            { key: 'portfolio', name: 'Steps' },
             { key: 'job', name: 'Job' },
             { key: 'social', name: 'Social' },
             { key: 'alcohol', name: 'Alcohol' },
